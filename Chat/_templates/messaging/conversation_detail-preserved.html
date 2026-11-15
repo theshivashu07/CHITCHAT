@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChitChat | Conversation</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+</head>
+<body class="bg-light">
+<div class="container py-4" style="max-width: 800px;">
+
+    <a href="{% url 'messaging:inbox' %}"
+       class="btn btn-outline-secondary btn-sm mb-3">
+        &larr; Back to inbox
+    </a>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Conversation #{{ conversation.id }}
+            </h5>
+        </div>
+
+        <!-- <div class="card-body" style="min-height: 350px;">  -->
+        <div
+            id="chatViewport"
+            class="card-body"
+            data-conversation-id="{{ conversation.id }}"
+            data-current-user-id="{{ request.user.id }}"
+            data-sync-url="{% url 'messaging:sync_messages' conversation.id %}"
+            style="min-height: 350px; max-height: 65vh; overflow-y: auto;"
+        >
+
+            {% for message in chat_messages %}
+                <!-- <div class="mb-3
+                    {% if message.sender_id == request.user.id %}
+                        text-end
+                    {% endif %}"> -->
+                <div
+                    class="chat-message mb-3 {% if message.sender_id == request.user.id %}text-end{% endif %}"
+                    data-message-id="{{ message.id }}"
+                    data-sender-id="{{ message.sender_id }}"
+                >
+
+                    <div class="small text-muted mb-1">
+                        {{ message.sender_display_name|default:message.sender_username }}
+                    </div>
+
+                    <div class="d-inline-block rounded-3 px-3 py-2 text-start
+                        {% if message.sender_id == request.user.id %}
+                            bg-primary text-white
+                        {% else %}
+                            bg-body-secondary text-dark
+                        {% endif %}"
+                        style="max-width: 85%; overflow-wrap: anywhere;">
+
+                        {% if message.deleted_for_everyone_at %}
+                            <em>This message was deleted.</em>
+                        {% else %}
+                            {{ message.body|linebreaksbr }}
+                        {% endif %}
+
+                        <!-- 
+                        <div class="small opacity-75 mt-1">
+                            {{ message.created_at|date:"g:i A" }}
+                            {% if message.edited_at %}(edited){% endif %}
+                        </div> 
+                        -->
+                        <small class="text-muted">
+                            {{ message.created_at|date:"H:i" }}
+
+                            <!-- 
+                            {% if message.sender_id == request.user.id %}
+                                <span class="message-status ms-1" data-status="sent">✓</span>
+                            {% endif %} 
+                            -->                            
+                            {% if message.sender_id == request.user.id %}
+                                <span class="message-status">
+                                    {% if message.delivery_status == "seen" %}
+                                        <span title="Seen">✓✓</span>
+                                    {% elif message.delivery_status == "delivered" %}
+                                        <span title="Delivered">✓✓</span>
+                                    {% else %}
+                                        <span title="Sent">✓</span>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+
+
+                        </small>
+
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted mt-5">
+                    No messages yet. Start the conversation!
+                </p>
+            {% endfor %}
+
+        </div>
+
+        <div class="card-footer bg-white">
+            {% for message in messages %}
+                <div class="alert alert-danger py-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <!-- <form method="post"> -->
+            <form method="post" id="chatForm">
+                {% csrf_token %}
+                <div class="input-group">
+                    <textarea
+                        id="chatInput"
+                        class="form-control"
+                        name="body"
+                        rows="2"
+                        maxlength="10000"
+                        placeholder="Type a message..."
+                        required
+                    ></textarea>
+                    <button class="btn btn-primary" type="submit">
+                        Send
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- after enter key press text sent -->
+
+<script>
+    const chatInput = document.getElementById("chatInput");
+
+    chatInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            document.getElementById("chatForm").requestSubmit();
+        }
+    });
+</script>
+
+
+<!-- websocket connection linking codes -->
+<!-- websocket-script.js -->
+<script>
+    
+document.addEventListener("DOMContentLoaded", function () {
+    const viewport = document.getElementById("chatViewport");
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("chatInput");
+
+    if (!viewport || !form || !input) return;
+
+    const conversationId = viewport.dataset.conversationId;
+    const currentUserId = Number(viewport.dataset.currentUserId);
+    const syncUrl = viewport.dataset.syncUrl;
+
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const socketUrl =
+        `${protocol}//${location.host}/ws/chat/${conversationId}/`;
+
+    let socket = null;
+    let reconnectTimer = null;
+    let reconnectAttempts = 0;
+    let syncInProgress = false;
+    let hasConnectedBefore = false;
+
+    // Messages waiting for server acknowledgement.
+    const pendingMessages = new Map();
+
+    function createClientMessageId() {
+        if (crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === "x" ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }
+        );
+    }
+
+    function sendEvent(data) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            return false;
+        }
+
+        try {
+            socket.send(JSON.stringify(data));
+            return true;
+        } catch (error) {
+            console.error("WebSocket send failed:", error);
+            return false;
+        }
+    }
+
+    function nearBottom() {
+        return (
+            viewport.scrollHeight -
+            viewport.scrollTop -
+            viewport.clientHeight
+        ) <= 100;
+    }
+
+    function scrollToBottom(smooth = true) {
+        viewport.scrollTo({
+            top: viewport.scrollHeight,
+            behavior: smooth ? "smooth" : "auto",
+        });
+    }
+
+    function formatTime(value) {
+        return new Date(value).toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+        });
+    }
+
+    function getLastMessageId() {
+        let maxId = 0;
+
+        viewport.querySelectorAll("[data-message-id]").forEach(
+            function (element) {
+                const id = Number(element.dataset.messageId);
+
+                if (Number.isFinite(id) && id > maxId) {
+                    maxId = id;
+                }
+            }
+        );
+
+        return maxId;
+    }
+
+    function renderMessage(message) {
+        if (!message || message.id == null) return;
+
+        const existing = viewport.querySelector(
+            `[data-message-id="${message.id}"]`
+        );
+
+        if (existing) return;
+
+        const wasAtBottom = nearBottom();
+        const outgoing =
+            Number(message.sender_id) === currentUserId;
+
+        const row = document.createElement("div");
+        row.className =
+            `chat-message mb-3 ${outgoing ? "text-end" : ""}`;
+
+        row.dataset.messageId = message.id;
+        row.dataset.senderId = message.sender_id ?? "";
+
+        if (!outgoing) {
+            const sender = document.createElement("div");
+            sender.className = "small text-muted mb-1";
+            sender.textContent =
+                message.sender_display_name ||
+                message.sender_username ||
+                "Unknown user";
+
+            row.appendChild(sender);
+        }
+
+        const bubble = document.createElement("div");
+        bubble.className = outgoing
+            ? "d-inline-block rounded-3 px-3 py-2 text-start bg-primary text-white"
+            : "d-inline-block rounded-3 px-3 py-2 text-start bg-body-secondary text-dark";
+
+        bubble.style.maxWidth = "85%";
+        bubble.style.overflowWrap = "anywhere";
+
+        const body = document.createElement("div");
+        body.textContent = message.body;
+        bubble.appendChild(body);
+
+        const meta = document.createElement("div");
+        meta.className = "small opacity-75 mt-1";
+        meta.appendChild(
+            document.createTextNode(formatTime(message.created_at))
+        );
+
+        if (outgoing) {
+            const status = document.createElement("span");
+            status.className = "message-status ms-1";
+            status.dataset.status = "sent";
+            status.textContent = "✓";
+            status.title = "Sent";
+            meta.appendChild(status);
+        }
+
+        bubble.appendChild(meta);
+        row.appendChild(bubble);
+        viewport.appendChild(row);
+
+        if (wasAtBottom) {
+            scrollToBottom();
+        }
+    }
+
+    function acknowledgeIncoming(messageId) {
+        const id = Number(messageId);
+        const activelyReading =
+            document.visibilityState === "visible" && document.hasFocus();
+
+        // Seen implies delivered: one event, not two.
+        sendEvent(activelyReading
+            ? { type: "mark_seen", message_id: id }
+            : { type: "mark_delivered", message_id: id }
+        );
+    }
+
+    function markThroughLastMessage() {
+        if (document.visibilityState !== "visible" || !document.hasFocus()) return;
+        const lastMessageId = getLastMessageId();
+        if (lastMessageId > 0) {
+            sendEvent({
+                type: "mark_through",
+                last_message_id: lastMessageId,
+                status: "seen",
+            });
+        }
+    }
+
+    function applyReceiptUpdate(data) {
+        if (!data || Number(data.sender_id) !== currentUserId) return;
+        if (Number(data.conversation_id) !== Number(conversationId)) return;
+
+        const ids = Array.isArray(data.message_ids)
+            ? data.message_ids
+            : (data.message_id != null ? [data.message_id] : []);
+
+        ids.forEach(function (messageId) {
+            const row = viewport.querySelector(
+                `[data-message-id="${Number(messageId)}"]`
+            );
+            const status = row?.querySelector(".message-status, .msg-status");
+            if (!status) return;
+
+            const ranks = { sent: 0, delivered: 1, seen: 2 };
+            const currentRank = ranks[status.dataset.status || "sent"] || 0;
+            const incomingRank = ranks[data.status] ?? 0;
+            if (incomingRank < currentRank) return; // Never let a late event downgrade a tick.
+
+            status.textContent = incomingRank >= 1 ? "✓✓" : "✓";
+            status.dataset.status = data.status;
+            status.title = data.status === "seen"
+                ? "Seen"
+                : data.status === "delivered" ? "Delivered" : "Sent";
+            status.classList.toggle("text-info", data.status === "seen");
+            status.classList.toggle("msg-status-seen", data.status === "seen");
+            status.classList.toggle("msg-status-delivered", data.status === "delivered");
+            status.classList.toggle("msg-status-pending", data.status === "sent");
+        });
+    }
+
+    window.addEventListener("chitchat:receipt-update", function (event) {
+        applyReceiptUpdate(event.detail);
+    });
+
+    window.addEventListener("chitchat:pending-chat-messages", function () {
+        syncMissedMessages();
+    });
+
+    function flushPendingMessages() {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+        for (const [clientMessageId, message] of pendingMessages) {
+            const sent = sendEvent({
+                type: "send_message",
+                client_message_id: clientMessageId,
+                body: message.body,
+            });
+
+            if (!sent) break;
+        }
+    }
+
+    async function syncMissedMessages() {
+        if (syncInProgress || !syncUrl) return;
+
+        syncInProgress = true;
+
+        try {
+            let afterId = getLastMessageId();
+            let hasMore = true;
+            let highestIncomingId = 0;
+
+            while (hasMore) {
+                const url = new URL(syncUrl, location.origin);
+                url.searchParams.set("after_id", String(afterId));
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    credentials: "same-origin",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Message sync failed: HTTP ${response.status}`
+                    );
+                }
+
+                const result = await response.json();
+
+                for (const message of result.messages || []) {
+                    renderMessage(message);
+
+                    if (message.client_message_id) {
+                        pendingMessages.delete(
+                            message.client_message_id
+                        );
+                    }
+
+                    if (Number(message.sender_id) !== currentUserId) {
+                        highestIncomingId = Math.max(
+                            highestIncomingId,
+                            Number(message.id) || 0
+                        );
+                    }
+
+                    afterId = Math.max(afterId, Number(message.id) || 0);
+                }
+
+                hasMore = Boolean(result.has_more);
+
+                // Prevent an accidental endless loop if the server
+                // reports more records but returns no usable progress.
+                if (hasMore && !(result.messages || []).length) {
+                    break;
+                }
+            }
+
+            // One batch acknowledgement for messages missed while disconnected.
+            if (highestIncomingId > 0) {
+                const activelyReading =
+                    document.visibilityState === "visible" && document.hasFocus();
+                sendEvent({
+                    type: "mark_through",
+                    last_message_id: highestIncomingId,
+                    status: activelyReading ? "seen" : "delivered",
+                });
+            }
+        } catch (error) {
+            console.error("Missed-message sync failed:", error);
+        } finally {
+            syncInProgress = false;
+        }
+    }
+
+    function scheduleReconnect() {
+        if (reconnectTimer !== null) return;
+
+        reconnectAttempts += 1;
+
+        const delay = Math.min(
+            1000 * (2 ** Math.min(reconnectAttempts - 1, 4)),
+            15000
+        );
+
+        const jitter = Math.floor(Math.random() * 500);
+
+        console.warn(
+            `Reconnecting chat in ${delay + jitter}ms...`
+        );
+
+        reconnectTimer = setTimeout(function () {
+            reconnectTimer = null;
+            connectSocket();
+        }, delay + jitter);
+    }
+
+    function connectSocket() {
+        try {
+            socket = new WebSocket(socketUrl);
+        } catch (error) {
+            console.error("Could not create WebSocket:", error);
+            scheduleReconnect();
+            return;
+        }
+
+        const thisSocket = socket;
+
+        thisSocket.addEventListener("open", function () {
+            if (socket !== thisSocket) return;
+
+            reconnectAttempts = 0;
+            console.log("Chat WebSocket connected:", conversationId);
+
+            // Initial history/status came from Django's HTML render.
+            // Only reconcile missed messages after an actual reconnect.
+            if (hasConnectedBefore) {
+                syncMissedMessages();
+            }
+            hasConnectedBefore = true;
+            flushPendingMessages();
+            scrollToBottom(false);
+        });
+
+        thisSocket.addEventListener("message", function (event) {
+            let data;
+
+            try {
+                data = JSON.parse(event.data);
+            } catch (error) {
+                console.error("Invalid WebSocket JSON:", error);
+                return;
+            }
+
+            if (data.type === "connection_established") {
+                console.log("Chat connection established.");
+                return;
+            }
+
+            if (data.type === "error") {
+                console.error("Chat server error:", data.message);
+                alert(data.message);
+                return;
+            }
+
+            if (data.type === "message_ack") {
+                const clientId = data.client_message_id;
+
+                if (clientId) {
+                    pendingMessages.delete(clientId);
+                }
+
+                // Server confirms the message was saved.
+                renderMessage(data.message);
+                return;
+            }
+
+            if (data.type === "message") {
+                const message = data.message;
+
+                if (message.client_message_id) {
+                    pendingMessages.delete(message.client_message_id);
+                }
+
+                renderMessage(message);
+
+                if (Number(message.sender_id) !== currentUserId) {
+                    acknowledgeIncoming(message.id);
+                }
+
+                return;
+            }
+
+            if (data.type === "receipt_update" || data.type === "receipt_batch_update") {
+                applyReceiptUpdate(data);
+            }
+        });
+
+        thisSocket.addEventListener("close", function (event) {
+            if (socket !== thisSocket) return;
+
+            console.warn("WebSocket closed:", event.code);
+            scheduleReconnect();
+        });
+
+        thisSocket.addEventListener("error", function (event) {
+            console.error("WebSocket connection error:", event);
+            // The close handler schedules reconnection.
+        });
+    }
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const body = input.value.trim();
+        if (!body) return;
+
+        const clientMessageId = createClientMessageId();
+
+        pendingMessages.set(clientMessageId, { body });
+
+        // Keep the message queued in memory if the socket is down.
+        // It will be retried after reconnection.
+        flushPendingMessages();
+
+        input.value = "";
+        input.focus();
+    });
+
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+            markThroughLastMessage();
+        }
+    });
+
+    window.addEventListener("focus", markThroughLastMessage);
+
+    window.addEventListener("beforeunload", function () {
+        if (reconnectTimer !== null) {
+            clearTimeout(reconnectTimer);
+        }
+    });
+
+    connectSocket();
+});
+
+</script>
+
+
+
+<!-- notification-script.js -->
+<script>
+    /* Include on every authenticated page (ideally the shared base template). */
+document.addEventListener("DOMContentLoaded", function () {
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const socketUrl = `${protocol}//${location.host}/ws/notifications/`;
+    const chatViewport = document.getElementById("chatViewport");
+    const currentConversationId = chatViewport
+        ? Number(chatViewport.dataset.conversationId)
+        : null;
+
+    let socket = null;
+    let retryTimer = null;
+    let heartbeatTimer = null;
+    let reconnectAttempts = 0;
+    const processedMessageIds = new Set();
+
+    function sendEvent(payload) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return false;
+        try {
+            socket.send(JSON.stringify(payload));
+            return true;
+        } catch (error) {
+            console.error("Notification socket send failed:", error);
+            return false;
+        }
+    }
+
+    function setBadge(element, count) {
+        if (!element) return;
+        const value = Math.max(0, Number(count) || 0);
+        element.textContent = value > 99 ? "99+" : String(value);
+        element.hidden = value === 0;
+        element.classList.toggle("d-none", value === 0);
+    }
+
+    function applyUnreadCounts(data) {
+        const counts = data.counts || {};
+        document.querySelectorAll("[data-unread-count-for]").forEach(function (badge) {
+            setBadge(badge, counts[String(badge.dataset.unreadCountFor)] || 0);
+        });
+        document.querySelectorAll("[data-total-unread-count]").forEach(function (badge) {
+            setBadge(badge, data.total || 0);
+        });
+    }
+
+    function showToast(message) {
+        let container = document.getElementById("chitchat-toast-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "chitchat-toast-container";
+            container.className = "toast-container position-fixed bottom-0 end-0 p-3";
+            container.style.zIndex = "1090";
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement("div");
+        toast.className = "toast align-items-center text-bg-light border shadow-sm";
+        toast.setAttribute("role", "status");
+        toast.setAttribute("aria-live", "polite");
+        toast.setAttribute("aria-atomic", "true");
+        const row = document.createElement("div");
+        row.className = "d-flex";
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        const sender = message.sender_display_name || message.sender_username || "New message";
+        const text = typeof message.body === "string" ? message.body : "Sent you a message";
+        body.textContent = `${sender}: ${text.length > 120 ? text.slice(0, 117) + "…" : text}`;
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "btn-close me-2 m-auto";
+        close.setAttribute("aria-label", "Close");
+        close.addEventListener("click", function () { toast.remove(); });
+        row.append(body, close);
+        toast.appendChild(row);
+        container.appendChild(toast);
+        if (window.bootstrap && window.bootstrap.Toast) {
+            const instance = new bootstrap.Toast(toast, { delay: 4500 });
+            toast.addEventListener("hidden.bs.toast", function () { toast.remove(); });
+            instance.show();
+        } else {
+            toast.classList.add("show");
+            setTimeout(function () { toast.remove(); }, 5000);
+        }
+    }
+
+    function handleMessageNotification(message, fromBacklog) {
+        if (!message || message.id == null) return;
+        const id = Number(message.id);
+        if (processedMessageIds.has(id)) {
+            if (fromBacklog) sendEvent({ type: "acknowledge_notifications", message_ids: [id] });
+            return;
+        }
+        processedMessageIds.add(id);
+
+        const sameChatIsOpen = currentConversationId === Number(message.conversation_id);
+        const activelyReading = sameChatIsOpen &&
+            document.visibilityState === "visible" && document.hasFocus();
+
+        if (!activelyReading && !fromBacklog) {
+            document.querySelectorAll(
+                `[data-unread-count-for="${Number(message.conversation_id)}"]`
+            ).forEach(function (badge) {
+                const current = Number.parseInt(badge.textContent, 10) || 0;
+                setBadge(badge, current + 1);
+            });
+            document.querySelectorAll("[data-total-unread-count]").forEach(function (badge) {
+                const current = Number.parseInt(badge.textContent, 10) || 0;
+                setBadge(badge, current + 1);
+            });
+            if (!sameChatIsOpen) showToast(message);
+        }
+
+        if (fromBacklog) {
+            // Ack delivered notifications in batches below, not one WS event per message.
+            return;
+        }
+        // The chat socket sends a mark_seen event if this chat is genuinely in focus.
+        sendEvent({ type: "mark_delivered", message_id: id });
+        window.dispatchEvent(new CustomEvent("chitchat:new-message-notification", { detail: message }));
+    }
+
+    function updateTicks(data) {
+        window.dispatchEvent(new CustomEvent("chitchat:receipt-update", { detail: data }));
+        if (Number(data.sender_id) === 0) return;
+        const ids = Array.isArray(data.message_ids)
+            ? data.message_ids
+            : (data.message_id != null ? [data.message_id] : []);
+        ids.forEach(function (id) {
+            const row = document.querySelector(`[data-message-id="${Number(id)}"]`);
+            const status = row && row.querySelector(".message-status, .msg-status");
+            if (!status || Number(row.dataset.senderId) !== Number(data.sender_id)) return;
+            const ranks = { sent: 0, delivered: 1, seen: 2 };
+            const currentRank = ranks[status.dataset.status || "sent"] || 0;
+            const incomingRank = ranks[data.status] ?? 0;
+            if (incomingRank < currentRank) return;
+            status.textContent = incomingRank >= 1 ? "✓✓" : "✓";
+            status.dataset.status = data.status;
+            status.title = data.status === "seen" ? "Seen" : data.status === "delivered" ? "Delivered" : "Sent";
+            status.classList.toggle("text-info", data.status === "seen");
+            status.classList.toggle("msg-status-seen", data.status === "seen");
+        });
+    }
+
+    function scheduleReconnect() {
+        if (retryTimer) return;
+        reconnectAttempts += 1;
+        const delay = Math.min(1000 * (2 ** Math.min(reconnectAttempts - 1, 4)), 15000) + Math.floor(Math.random() * 500);
+        retryTimer = setTimeout(function () {
+            retryTimer = null;
+            connect();
+        }, delay);
+    }
+
+    function connect() {
+        try {
+            socket = new WebSocket(socketUrl);
+        } catch (error) {
+            console.error("Could not open notification WebSocket:", error);
+            scheduleReconnect();
+            return;
+        }
+        const currentSocket = socket;
+        currentSocket.addEventListener("open", function () {
+            if (socket !== currentSocket) return;
+            reconnectAttempts = 0;
+            sendEvent({ type: "request_unread_counts" });
+            sendEvent({ type: "heartbeat" });
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+            heartbeatTimer = setInterval(function () {
+                sendEvent({ type: "heartbeat" });
+            }, 20000);
+        });
+        currentSocket.addEventListener("message", function (event) {
+            let data;
+            try { data = JSON.parse(event.data); }
+            catch (error) { console.error("Bad notification JSON:", error); return; }
+
+            if (data.type === "unread_counts") {
+                applyUnreadCounts(data);
+            } else if (data.type === "new_message_notification") {
+                handleMessageNotification(data.message, false);
+            } else if (data.type === "pending_notifications") {
+                const list = Array.isArray(data.messages) ? data.messages : [];
+                let activeChatHasPending = false;
+                list.forEach(function (message) {
+                    const id = Number(message.id);
+                    if (!processedMessageIds.has(id)) {
+                        processedMessageIds.add(id);
+                        if (currentConversationId === Number(message.conversation_id)) {
+                            activeChatHasPending = true;
+                        } else {
+                            showToast(message);
+                        }
+                    }
+                });
+                if (activeChatHasPending) {
+                    window.dispatchEvent(new CustomEvent("chitchat:pending-chat-messages"));
+                }
+                if (list.length) {
+                    sendEvent({
+                        type: "acknowledge_notifications",
+                        message_ids: list.map(function (message) { return Number(message.id); }),
+                    });
+                }
+            } else if (data.type === "receipt_update" || data.type === "receipt_batch_update") {
+                updateTicks(data);
+            } else if (data.type === "connection_established") {
+                // The unread-count snapshot and pending notification batch follow this event.
+            }
+        });
+        currentSocket.addEventListener("close", function () {
+            if (socket !== currentSocket) return;
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+            scheduleReconnect();
+        });
+        currentSocket.addEventListener("error", function (error) {
+            console.error("Notification WebSocket error:", error);
+        });
+    }
+
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+            sendEvent({ type: "heartbeat" });
+            sendEvent({ type: "request_unread_counts" });
+        }
+    });
+    window.addEventListener("beforeunload", function () {
+        if (heartbeatTimer) clearInterval(heartbeatTimer);
+        if (retryTimer) clearTimeout(retryTimer);
+    });
+
+    connect();
+});
+
+</script>
+
+
+</body>
+</html>

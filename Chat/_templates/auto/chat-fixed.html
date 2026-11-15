@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG AI Chat Interface</title>
+
+    
+    
+    
+    <!-- icon -->
+    <!-- <link rel="icon" type="image/x-icon" href="https://i.fbcd.co/products/resized/resized-1500-1000/1907-m10-i006-n001-e01p-d478efea6152c427f222b1c0d046ec794b9d80c3765b803c348deb32ed2df138.webp" /> -->
+    <link rel="icon" type="image/x-icon" href="happy-facess.png" />
+
+    <!-- bootstrap link and script -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- bootstrap and fontawesome icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amita:wght@400;700&family=Berkshire+Swash&family=Cinzel:wght@400..900&family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Geist:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+
+    <style>
+      * {
+        font-family: "EB Garamond";
+        /* font-family: 'PT Sans'; */
+      }
+      header a {
+        /* font-family: 'Berkshire Swash', 'Cinzel'; */
+        font-family: "Cinzel" !important;
+      }
+
+
+
+/* ================================
+   Custom Chat Scrollbar
+   ================================ */
+
+.chat-messages-viewport {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    scrollbar-color: #f0f0f0 transparent;
+}
+
+/* Chrome / Edge / Safari */
+.chat-messages-viewport::-webkit-scrollbar {
+    width: 5px;              /* scrollbar ki width */
+}
+
+/* Scrollbar background */
+.chat-messages-viewport::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Actual scrolling handle */
+.chat-messages-viewport::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 0;        /* IMPORTANT: no rounded corners */
+}
+
+/* Mouse hover karne par clearly visible */
+.chat-messages-viewport:hover::-webkit-scrollbar-thumb {
+    background-color: #9ca3af;
+}
+
+/* Scrollbar arrows/buttons completely remove */
+.chat-messages-viewport::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+
+
+
+/* Scroll to bottom button */
+
+#scrollBottomBtn {
+    display: none;
+    position: absolute;
+    right: 25px;
+    bottom: 85px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    border: 1px solid #dee2e6;
+    color: #555;
+    background-color: #ffffff;
+
+    background-color: #fbfbfb;
+    border: 1px solid #e4e4e4;
+}
+
+#scrollBottomBtn:hover {
+    background-color: #f1f3f5;
+    color: #222;
+}
+
+    </style>
+
+
+
+
+
+    <style>
+        body { background-color: #f4f7f6; height: 100vh; overflow: hidden; margin: 0; }
+        .chat-container { height: calc(100vh - 40px); margin-top: 20px; margin-bottom: 20px; }
+        
+        /* Layout Card Panels */
+        .chat-sidebar, .chat-window { 
+            border: none; 
+            border-radius: 15px; 
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05); 
+            background-color: #ffffff;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Chat History Sidebar Lists */
+        .history-list { height: calc(100% - 70px); overflow-y: auto; }
+        .history-item { 
+            border-radius: 10px; 
+            transition: all 0.2s ease; 
+            cursor: pointer; 
+            padding: 12px;
+            border: 1px solid transparent;
+        }
+        .history-item:hover { background-color: #f8f9fa; border-color: #dee2e6; }
+        .history-item.active { background-color: #e7f1ff; border-color: #0d6efd; }
+        .history-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+
+        /* Main Chat Window Messaging Viewport */
+        .chat-messages-viewport { 
+            height: calc(100% - 150px); 
+            overflow-y: auto; 
+            padding: 20px; 
+            background-color: #fafafa;
+            border-radius: 12px;
+        }
+
+        /* New messages indicator */
+        #newMessagesBtn {
+            display: none;
+            position: absolute;
+            right: 30px;
+            bottom: 85px;
+            z-index: 20;
+            border-radius: 20px;
+        }
+
+        /* Message Bubble Custom Stylings */
+        .msg-bubble { max-width: 70%; padding: 12px 16px; border-radius: 15px; font-size: 0.92rem; line-height: 1.5; }
+        .msg-incoming { background-color: #ffffff; color: #333; border: 1px solid #dee2e6; border-top-left-radius: 2px; }
+        .msg-outgoing { background-color: #0d6efd; color: #ffffff; border-top-right-radius: 2px; }
+        
+        /* Sticky System Notification Anchors */
+        .system-divider { display: flex; align-items: center; text-align: center; color: #888; font-size: 0.78rem; font-weight: 600; margin: 20px 0; }
+        .system-divider::before, .system-divider::after { content: ''; flex: 1; border-bottom: 1px solid #dee2e6; }
+        .system-divider:not(:empty)::before { margin-right: 1em; }
+        .system-divider:not(:empty)::after { margin-left: 1em; }
+        .system-alert-badge { background-color: #fff3cd; color: #856404; font-size: 0.78rem; border-radius: 8px; padding: 6px 12px; border: 1px solid #ffeeba; }
+
+        /* Fixed Bottom Chat Input Utility Box */
+        .chat-input-sticky-footer { 
+            height: 70px; 
+            background-color: #ffffff; 
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid chat-container">
+    <div class="row h-100 g-3 px-3">
+        
+        <!-- LEFT PANEL: Chat Histories Sidebar -->
+        <div class="col-md-4 col-lg-3 h-100">
+            <div class="card chat-sidebar p-3">
+                <h5 class="fw-bold text-dark mb-3 px-2"><i class="fa-regular fa-comments me-2 text-primary"></i>Conversations</h5>
+                <div class="history-list d-flex flex-column gap-2">
+                    
+                    <!-- Chat Session Item 1 (Active) -->
+                    <div class="history-item active d-flex align-items-center gap-3">
+                        <img src="https://us.images.westend61.de/0001251456pw/portrait-of-female-programmer-using-laptop-while-sitting-at-desk-in-office-MASF13804.jpg" class="history-avatar" alt="User">
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <h6 class="mb-0 fw-bold text-dark text-truncate small">Sarah Jenkins</h6>
+                                <span class="text-muted" style="font-size: 0.7rem;">5m ago</span>
+                            </div>
+                            <p class="mb-0 text-muted small text-truncate">Let's test the RAG model pipeline now.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Session Item 2 -->
+                    <div class="history-item d-flex align-items-center gap-3">
+                        <!-- <img src="https://www.shutterstock.com/image-photo/programmer-woman-coding-on-computer-260nw-1986023957.jpg" class="history-avatar" alt="User"> -->
+                        <!-- <img src="https://outsourced.co/wp-content/uploads/2024/10/software-engineer-ind.png" class="history-avatar" alt="User"> -->
+                        <img src="https://images.ctfassets.net/wp1lcwdav1p1/3cIZo9bfq14o3zy3JsPG7r/40d9e956d0605486f7e5d2da11738d00/GettyImages-1919240544.jpg?w=1500&h=680&q=60&fit=fill&f=faces&fm=jpg&fl=progressive" class="history-avatar" alt="User">
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <h6 class="mb-0 fw-semibold text-dark text-truncate small">Dev Agency Bot</h6>
+                                <span class="text-muted" style="font-size: 0.7rem;">Yesterday</span>
+                            </div>
+                            <p class="mb-0 text-muted small text-truncate">Deployment successfully completed.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+                <!-- RIGHT PANEL: Main Chat View Area -->
+        <div class="col-md-8 col-lg-9 h-100">
+            <div class="card chat-window d-flex flex-column justify-content-between">
+                
+                <!-- Chat Window Header -->
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://us.images.westend61.de/0001251456pw/portrait-of-female-programmer-using-laptop-while-sitting-at-desk-in-office-MASF13804.jpg" class="history-avatar" alt="User">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">Sarah Jenkins</h6>
+                            <span class="text-success small" style="font-size: 0.75rem;"><i class="fa-solid fa-circle me-1" style="font-size: 0.6rem;"></i> Active Now</span>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fs-5"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item text-danger small fw-semibold" href="#"><i class="fa-solid fa-ban me-2"></i>Block User</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Viewport (Scrollable Data Engine) -->
+                <div class="chat-messages-viewport d-flex flex-column gap-3" id="chatViewport">
+                    
+                    <!-- DUMMY HISTORICAL SCENARIO: Older Dialogues -->
+                    <div class="system-divider">Yesterday</div>
+
+                    <div class="d-flex gap-2 align-items-end">
+                        <div class="msg-bubble msg-incoming">Hey! Are you working on updating the vector database configurations tonight?</div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-end justify-content-end">
+                        <div class="msg-bubble msg-outgoing">Yes, I'm analyzing how chunks are structured so the RAG engine retrieves much more accurate search responses.</div>
+                    </div>
+
+                    <!-- DUMMY SCENARIO: Block Action Event -->
+                    <div class="d-flex justify-content-center my-2">
+                        <div class="system-alert-badge"><i class="fa-solid fa-user-slash me-2"></i>You blocked this contact. You cannot send or receive texts.</div>
+                    </div>
+
+                    <!-- DUMMY SCENARIO: Unblock Action Event -->
+                    <div class="d-flex justify-content-center my-2">
+                        <div class="system-alert-badge bg-light text-muted border-0"><i class="fa-solid fa-user-check me-2"></i>You unblocked this contact. Now you can send and receive texts.</div>
+                    </div>
+
+                    <!-- DUMMY SCENARIO: Today's Chats Context -->
+                    <div class="system-divider">Today</div>
+
+                    <div class="d-flex gap-2 align-items-end">
+                        <div class="msg-bubble msg-incoming">Awesome! I noticed you fixed the multi-account profile page. Let's test the RAG model pipeline now.</div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-end justify-content-end">
+                        <div class="msg-bubble msg-outgoing">Thanks! It works flawlessly. Paste your query below, and the chatbot will parse the embedded PDF instantly.</div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-end">
+                        <div class="msg-bubble msg-incoming">Awesome! I noticed you fixed the portfolio page spacing. Let's inspect the chat window now.</div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-end">
+                        <div class="msg-bubble msg-incoming">Awesome! I noticed you fixed the portfolio page spacing. Let's inspect the chat window now.</div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-end justify-content-end">
+                        <div class="msg-bubble msg-outgoing">Thanks! The bottom container is fully locked down. You can scroll up to view older history logs easily.</div>
+                    </div>
+
+                    <!-- New dynamic elements print here via script -->
+                </div>
+
+
+
+
+                <button
+    type="button"
+    id="scrollBottomBtn"
+    class="btn btn-light shadow-sm"
+    title="Go to latest message"
+>
+    <!-- <i class="fa-solid fa-arrow-down"></i> -->
+    <i class="fa-solid fa-angles-down"></i>
+</button>
+
+
+                
+
+                                <!-- STICKY CHAT INPUT PANEL (Always locked at bottom base layout) -->
+                <div class="chat-input-sticky-footer">
+                    <form id="chatForm" class="w-100 d-flex gap-2 align-items-center">
+                        <button type="button" class="btn btn-link text-muted p-1"><i class="fa-solid fa-paperclip fs-5"></i></button>
+                        <input type="text" id="chatInput" class="form-control py-2 shadow-none border-secondary-subtle" placeholder="Type your prompt here for RAG execution..." autocomplete="off" required>
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2">
+                            <span>Send</span><i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div> <!-- End of Card Window -->
+        </div> <!-- End of Right Column -->
+
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle CDN -->
+<!-- Bootstrap JS is loaded below -->
+
+<!-- Smart Interaction Script Engine -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const chatViewport = document.getElementById("chatViewport");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const newMessagesBtn = document.getElementById("newMessagesBtn");
+
+
+    // --------------------------------------------------
+    // Is the user already near the latest message?
+    // --------------------------------------------------
+    function isNearBottom() {
+        const distanceFromBottom =
+            chatViewport.scrollHeight -
+            chatViewport.scrollTop -
+            chatViewport.clientHeight;
+
+        return distanceFromBottom <= 100;
+    }
+
+
+    // --------------------------------------------------
+    // Scroll to the latest message
+    // --------------------------------------------------
+    function scrollToBottom(smooth = false) {
+
+        chatViewport.scrollTo({
+            top: chatViewport.scrollHeight,
+            behavior: smooth ? "smooth" : "auto"
+        });
+
+        newMessagesBtn.style.display = "none";
+    }
+
+
+    // --------------------------------------------------
+    // Initial opening:
+    // Always show the latest messages
+    // --------------------------------------------------
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            scrollToBottom(false);
+        });
+    });
+
+
+    // --------------------------------------------------
+    // User manually scrolls
+    // --------------------------------------------------
+    chatViewport.addEventListener("scroll", function () {
+
+        if (isNearBottom()) {
+            newMessagesBtn.style.display = "none";
+        }
+
+    });
+
+
+    // --------------------------------------------------
+    // Add a new message
+    // --------------------------------------------------
+    function addMessage(text, type = "outgoing") {
+
+        // Check BEFORE adding the message.
+        const wasAtBottom = isNearBottom();
+
+
+        const msgRow = document.createElement("div");
+
+        msgRow.className =
+            type === "outgoing"
+                ? "d-flex gap-2 align-items-end justify-content-end"
+                : "d-flex gap-2 align-items-end";
+
+
+        const msgBubble = document.createElement("div");
+
+        msgBubble.className =
+            type === "outgoing"
+                ? "msg-bubble msg-outgoing"
+                : "msg-bubble msg-incoming";
+
+
+        msgBubble.textContent = text;
+
+        msgRow.appendChild(msgBubble);
+        chatViewport.appendChild(msgRow);
+
+
+        // User was already at the bottom.
+        // Follow the new message automatically.
+        if (wasAtBottom) {
+            scrollToBottom(true);
+        }
+
+        // User was reading older messages.
+        // Do not disturb them.
+        else {
+            newMessagesBtn.style.display = "block";
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Send message
+    // --------------------------------------------------
+    chatForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const messageText = chatInput.value.trim();
+
+        if (messageText === "") {
+            return;
+        }
+
+
+        addMessage(messageText, "outgoing");
+
+        chatInput.value = "";
+        chatInput.focus();
+
+
+        // Demo AI response.
+        // Replace this later with your Django/RAG response.
+        setTimeout(function () {
+
+            addMessage(
+                "Got it! I'm processing your RAG query...",
+                "incoming"
+            );
+
+        }, 700);
+    });
+
+
+    // --------------------------------------------------
+    // New messages button
+    // --------------------------------------------------
+    newMessagesBtn.addEventListener("click", function () {
+        scrollToBottom(true);
+    });
+
+
+    // --------------------------------------------------
+    // Expose this for your future API / streaming code.
+    //
+    // Example:
+    // window.chatAddMessage("AI response", "incoming");
+    // --------------------------------------------------
+    window.chatAddMessage = addMessage;
+
+});
+</script>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const chatViewport = document.getElementById("chatViewport");
+    const scrollBottomBtn = document.getElementById("scrollBottomBtn");
+
+
+    // -----------------------------------------
+    // Check whether user is near the bottom
+    // -----------------------------------------
+    function isNearBottom() {
+
+        const distanceFromBottom =
+            chatViewport.scrollHeight -
+            chatViewport.scrollTop -
+            chatViewport.clientHeight;
+
+        return distanceFromBottom <= 100;
+    }
+
+
+    // -----------------------------------------
+    // Scroll directly to latest message
+    // -----------------------------------------
+    function scrollToBottom(smooth = true) {
+
+        chatViewport.scrollTo({
+            top: chatViewport.scrollHeight,
+            behavior: smooth ? "smooth" : "auto"
+        });
+
+        // Hide button after reaching bottom
+        scrollBottomBtn.style.display = "none";
+    }
+
+
+    // -----------------------------------------
+    // Initially hide button
+    // -----------------------------------------
+    scrollBottomBtn.style.display = "none";
+
+
+    // -----------------------------------------
+    // Detect user's scrolling
+    // -----------------------------------------
+    chatViewport.addEventListener("scroll", function () {
+
+        if (isNearBottom()) {
+
+            // User is at/near bottom
+            scrollBottomBtn.style.display = "none";
+
+        } else {
+
+            // User has scrolled upward
+            scrollBottomBtn.style.display = "flex";
+
+        }
+
+    });
+
+
+    // -----------------------------------------
+    // Click → go directly to latest message
+    // -----------------------------------------
+    scrollBottomBtn.addEventListener("click", function () {
+
+        scrollToBottom(true);
+
+    });
+
+
+    // -----------------------------------------
+    // Make function available globally
+    // So your existing chat code can also use it
+    // -----------------------------------------
+    window.scrollChatToBottom = scrollToBottom;
+
+});
+</script>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intro / Splash Screen</title>
+
+    ...
+
+
+    
+
+<!-- at the last, under head tag -->
+
+<style>
+
+#intro-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    background: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.8s ease,
+        visibility 0.8s ease;
+}
+
+#intro-logo {
+    display: flex;
+    align-items: center;
+
+    font-size: 3rem;
+    font-weight: 600;
+
+    transform: scale(1);
+    filter: blur(0);
+
+    transition:
+        transform 0.8s ease,
+        filter 0.8s ease,
+        opacity 0.8s ease;
+}
+
+/* Hide animation */
+#intro-screen.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#intro-screen.hide #intro-logo {
+    transform: scale(1.15);
+    filter: blur(12px);
+    opacity: 0;
+}
+</style>
+
+
+</head>
+<body>
+
+
+    
+<!--  just after body tag starts -->
+
+{% if request.path == "/" %}
+
+<div id="intro-screen">
+
+    <div id="intro-logo">
+        
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 me-lg-4 text-dark text-decoration-none self-font-cinzel" style="font-size: x-large">
+
+            <i class="fa-solid fa-headphones fa-beat me-4 fs-1" style="--fa-animation-duration: 3s;"></i>
+
+            <div class="d-flex flex-column fw-light">
+                <span class="fs-1 fs-lg-1 self-font-cinzel">
+                    ChitChat —
+                </span>
+                <span class="fs-5 fs-lg-4" style="text-transform: lowercase;font-family: 'EB Garamond'; margin-top: -15px;">
+                    <span class="text-secondary">powered by</span>
+                    <span class="self-font-cinzel fs-lg-3">SHIVASHU</span>
+                </span>
+            </div>
+        </a>
+    </div>
+</div>
+{% endif %}
+        
+
+...
+
+
+
+
+
+
+<!-- script for logo animation of 5 seconds, only first time and at home page -->
+ 
+<!-- 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const intro = document.getElementById("intro-screen");
+
+    if (!intro) return;
+
+    // Already seen?
+    if (localStorage.getItem("chitchat_intro_seen") === "true") {
+        intro.remove();
+        return;
+    }
+
+    // Show for 5 seconds
+    setTimeout(function () {
+
+        intro.classList.add("hide");
+
+        // Animation complete
+        setTimeout(function () {
+            intro.remove();
+            localStorage.setItem("chitchat_intro_seen", "true");
+        }, 800);
+
+    }, 5000);
+
+});
+</script> 
+-->
+
+
+<!-- script for logo animation of 5 seconds, every time and at home page -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const intro = document.getElementById("intro-screen");
+
+    if (!intro) return;
+
+    setTimeout(function () {
+        intro.classList.add("hide");
+
+        setTimeout(function () {
+            intro.remove();
+        }, 800);
+
+    }, 5000);
+
+});
+</script> 
+
+    
+</body>
+</html>

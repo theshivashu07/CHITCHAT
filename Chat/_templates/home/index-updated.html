@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- icon -->
+    <!-- <link rel="icon" type="image/x-icon" href="happy-facess.png" /> -->
+    <link rel="icon" type="image/x-icon" href="/_uploads/icon/happy-facess.png" />
+
+    <title>ChitChat</title>
+
+    <!-- bootstrap link and script -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- bootstrap and fontawesome icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amita:wght@400;700&family=Berkshire+Swash&family=Cinzel:wght@400..900&family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Geist:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+
+    <style>
+      * {
+        font-family: "EB Garamond";
+        /* font-family: 'PT Sans'; */
+      }
+
+      header .self-font-cinzel,
+      header .self-font-cinzel a {
+        /* font-family: 'Berkshire Swash', 'Cinzel'; */
+        font-family: "Cinzel" !important;
+      }
+
+      .profile-dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      .profile-dropdown .dropdown-menu {
+        top: 100%;
+        right: 0;
+        left: auto;
+        margin: 2px 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+        
+      <header class="p-3 mb-3 border-bottom">
+        <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 me-4 text-dark text-decoration-none self-font-cinzel" style="font-size: x-large">
+              <!-- <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg> -->
+              <!-- <i class="fa-solid fa-headphones me-2"></i> -->
+              <!-- <i class="fa-solid fa-globe"></i> -->
+              <!-- <i class="fa-solid fa-robot me-2"></i> -->
+              <!-- <i class="fa-solid fa-at"></i> -->
+              <!-- sh <sup>2</sup> -->
+               
+              <!-- <i class="fa-solid fa-headphones fa-flip ms-2" style="--fa-animation-duration: 5s;"></i> -->
+              <!-- <i class="fa-solid fa-headphones fa-flip fa-shake me-2 " style="--fa-animation-duration: 25s;"></i> -->
+              <!-- <i class="fa-solid fa-headphones fa-flip me-2" style="--fa-animation-duration: 5s;"></i> -->
+              <i class="fa-solid fa-headphones fa-beat me-3" style="--fa-animation-duration: 3s;"></i>
+              shivashu
+              <!-- <h2 style="font-family: 'Berkshire Swash', 'Cinzel';">shivashu</h2> -->
+               
+              <!-- <i class="fa-regular fa-comments fa-flip me-2" style="--fa-animation-duration: 5s;"></i> -->
+              <!-- <i class="fa-brands fa-facebook-messenger fa-beat me-2" style="--fa-animation-duration: 5s;"></i> -->
+              <!-- ChitChat -->
+            </a>
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 self-font-cinzel">
+              <!-- <li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li> -->
+              <!-- <li><a href="#" class="nav-link px-2 link-dark">Inventory</a></li> -->
+              <!-- <li><a href="#" class="nav-link px-2 link-dark">Customers</a></li> -->
+              <!-- <li><a href="#" class="nav-link px-2 link-dark">Products</a></li> -->
+
+              <li><a href="/" class="nav-link px-2 link-dark activate">Home</a></li>
+              <li><a href="/security/" class="nav-link px-2 link-dark">Security</a></li>
+              <li><a href="/api/" class="nav-link px-2 link-dark">APIs</a></li>
+              <li><a href="#" class="nav-link px-2 link-secondary">@ChitChat</a></li>
+            </ul>
+
+            <!-- 
+            <div class="text-end">
+                <a href="notifications.html" class="btn btn-outline-light rounded-pill me-2" style="color: black">
+                    <i class="fa-solid fa-bell fa-swing fa-shake" style="--fa-animation-duration: 2s;"></i>
+                </a>
+                <button type="button" class="btn btn-outline-primary me-2">Login</button>
+                <button type="button" class="btn btn-primary">Sign-up</button>
+            </div> 
+            -->
+
+            <!-- login logout manage differently -->
+
+            {% if user.is_authenticated %}
+            <div class="dropdown text-end d-flex gap-2 align-items-center profile-dropdown">
+
+              <!-- 
+                <a href="/notifications/"
+                    class="btn btn-outline-light rounded-pill me-2"
+                    style="color: black">
+                    <i class="fa-solid fa-bell fa-swing fa-shake fs-4" style="--fa-animation-duration: 2s;"></i>
+                </a> 
+              -->
+
+              <!-- 
+              <a href="/notifications/" class="btn btn-outline-light rounded-pill position-relative p-2" style="color: black; border-color: #e2e2e2;">
+                <i class="bi bi-bell fs-4 d-flex align-items-center"></i>
+
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.75rem;">
+                  77+
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </a> 
+              -->
+
+              <!-- 1. नोटिफिकेशन लिंक (अब यह ड्रॉपडाउन से बाहर और सुरक्षित है) -->
+              <a href="/notifications/" class="btn btn-outline-light rounded-pill position-relative p-2 me-4" style="color: black; border-color: #e2e2e2;">
+                <!-- Notification Icon -->
+                <i class="d-flex align-items-center fa-solid fa-bell fa-swing fa-shake fa-beat fs-5 p-1" style="--fa-animation-duration: 2s;"></i>
+                <!-- Notification Count Badge (बिलकुल घंटी के ऊपर दिखेगा) -->
+                <!-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-light text-danger" style="font-size: 0.75rem; border: 1px solid #ff000020;"> -->
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.75rem;">
+                  77+
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </a>
+
+              <!-- 2. यूजर नेम और डिजिग्नेशन (यह भी ड्रॉपडाउन से बाहर है ताकि नाम पर होवर करने से मेनू न खुले) -->
+              <div class="d-flex flex-column align-items-center me-2">
+                <h6 class="m-0 fw-semibold text-dark">SHivam SHukla</h6>
+                <small class="text-secondary" style="font-size: 0.8rem;">Senior AI Engineer</small>
+              </div>
+
+              <!-- 3. केवल प्रोफाइल इमेज ड्रॉपडाउन (अब होवर/क्लिक सिर्फ इसी पर काम करेगा) -->
+              <div class="dropdown profile-dropdown">
+                <a href="#" class="d-block link-dark text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="https://lh3.googleusercontent.com/a/ACg8ocKnUjMG6205OVsdQhQhjLThoHlNr36GMFJoSYG1gYLT4JCnIl3T=s360-c-no" alt="mdo" width="48" height="48" class="rounded-circle" style="border: 4px solid #e2e2e2; transition: transform 0.2s;" />
+                </a>
+
+                <!-- ड्रॉपडाउन मेनू की लिस्ट -->
+                <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fa-solid fa-user me-2"></i>
+                      Hey @{{request.user.username}}
+                    </a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item" href="#">Profile</a></li>
+                  <li><a class="dropdown-item" href="#">Resume</a></li>
+                  <li><a class="dropdown-item" href="#">Settings</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <a class="dropdown-item fw-bold text-danger" href="/security/signout/">
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-end">
+              <!-- 
+              <a href="/notifications/" class="btn btn-outline-light rounded-pill position-relative p-2 me-4" style="color: black; border-color: #e2e2e2;">
+                <i class="d-flex align-items-center fa-solid fa-bell fa-swing fa-shake fs-5 p-1" style="--fa-animation-duration: 2s;"></i>
+              </a> 
+              -->
+              <a href="/security/login/" class="btn btn-outline-primary me-2">Login</a>
+              <a href="/security/signup/" class="btn btn-primary">Sign-up</a>
+            </div>
+
+            {% endif %}
+
+          </div>
+        </div>
+      </header>
+
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+
+      <section>
+
+  <div class="container col-lg-10 mx-auto p-3 py-md-5">
+
+    <!-- HERO -->
+    <div class="row align-items-center g-5 py-4">
+
+      <div class="col-lg-8">
+
+        <h1 class="display-5 fw-bold mb-3">
+          Get started with
+          <strong style="font-family: 'Cinzel';">ChitChat!</strong>
+        </h1>
+
+        <p class="fs-5 mb-4">
+          <span style="font-family: 'Cinzel';">ChitChat</span>
+          is a complete messaging platform built to make private conversations
+          simple, flexible, and secure. You can use it directly from the web
+          or download the application and stay connected with your people from
+          anywhere.
+        </p>
+
+        <p class="fs-5 mb-4">
+          To get started, create your account and complete your basic profile.
+          You will be asked to provide your
+          <!-- <strong>full name, username, email address, mobile number, date of birth, bio/about</strong>,  -->
+          full name, username, email address, mobile number, date of birth, bio/about, 
+          and other profile details that help build your identity on 
+          <span style="font-family: 'Cinzel';">ChitChat</span>.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a href="/security/signup/" class="btn btn-primary btn-lg px-4">
+            Create Account
+          </a>
+
+          <a href="/security/login/" class="btn btn-outline-primary btn-lg px-4">
+            Login
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <hr class="my-5">
+
+
+    <!-- ACCESS & AUTHENTICATION -->
+    <div class="row g-5 mb-5">
+
+      <div class="col-md-6">
+
+        <h2 class="fw-semibold">
+          Simple and flexible access
+        </h2>
+
+        <p class="fs-5 text-secondary">
+          You can access <span style="font-family: 'Cinzel';">ChitChat</span>
+          in whichever way is convenient for you. Use the web application
+          directly or download the application for your device.
+        </p>
+
+      </div>
+
+
+      <div class="col-md-6">
+
+        <h2 class="fw-semibold">
+          Login your way
+        </h2>
+
+        <p class="fs-5 mb-3">
+          Sign in normally with your credentials or use available
+          <strong>OAuth2-based social authentication</strong> options.
+          Once authenticated, your account and conversations remain available
+          through your <span style="font-family: 'Cinzel';">ChitChat</span>
+          account.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- FIND PEOPLE -->
+    <div class="mb-5">
+
+      <h2 class="fw-semibold mb-3">
+        Find people and start chatting
+      </h2>
+
+      <p class="fs-5 col-lg-9">
+        After logging in, you can find other
+        <span style="font-family: 'Cinzel';">ChitChat</span>
+        users using their
+        <strong>username, email address, or name</strong>.
+        Select the right account, connect with them, and start your conversation.
+      </p>
+
+    </div>
+
+
+    <!-- CONTACT SYNC -->
+    <div class="row g-4 mb-5">
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-address-book fs-2 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              Email Contacts
+            </h4>
+
+            <p class="text-secondary mb-0">
+              Sync your saved email contacts and discover people you already
+              know without searching for every account manually.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-mobile-screen-button fs-2 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              Mobile Contacts
+            </h4>
+
+            <p class="text-secondary mb-0">
+              Use your phone contacts to find people and connect with your
+              existing network more easily.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-file-csv fs-2 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              CSV Import
+            </h4>
+
+            <p class="text-secondary mb-0">
+              Already have contact data in a CSV file?
+              You can use that data to help import and manage your contacts.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <hr class="my-5">
+
+
+    <!-- CHAT FEATURES -->
+    <div class="mb-5">
+
+      <h2 class="fw-semibold mb-3">
+        Chat, share and stay connected
+      </h2>
+
+      <p class="fs-5 col-lg-9">
+        <span style="font-family: 'Cinzel';">ChitChat</span>
+        is designed around an experience similar to modern messaging apps.
+        You can have conversations, send messages, and share different kinds
+        of content seamlessly.
+      </p>
+
+    </div>
+
+
+    <div class="row g-4 mb-5">
+
+      <!-- Messaging -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-comments fs-2 mb-3"></i>
+
+            <h4>Messaging</h4>
+
+            <p class="text-secondary mb-0">
+              Send and receive messages smoothly and continue your
+              conversations whenever you want.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Media -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-photo-film fs-2 mb-3"></i>
+
+            <h4>Media Sharing</h4>
+
+            <p class="text-secondary mb-0">
+              Share photos, videos, songs, documents, PDFs, text and
+              other supported media files inside conversations.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Documents -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <i class="fa-solid fa-file-arrow-up fs-2 mb-3"></i>
+
+            <h4>Document Sharing</h4>
+
+            <p class="text-secondary mb-0">
+              Send files and documents directly through chats while keeping
+              conversations and shared content together.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- CHAT MANAGEMENT -->
+    <div class="row g-4 mb-5">
+
+      <div class="col-md-6">
+
+        <div class="card h-100 border-0 shadow-sm">
+
+          <div class="card-body p-4">
+
+            <h3 class="fw-semibold mb-3">
+              Manage your conversations
+            </h3>
+
+            <p class="text-secondary">
+              Keep control over your conversations with features such as:
+            </p>
+
+            <ul class="list-group list-group-flush">
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-ban me-2"></i>
+                Block contacts
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-box-archive me-2"></i>
+                Archive chats
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-eye-slash me-2"></i>
+                Hide chats
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-lock me-2"></i>
+                Lock chats
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-trash me-2"></i>
+                Delete conversations
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-rotate-left me-2"></i>
+                Recover deleted conversations
+              </li>
+
+              <li class="list-group-item px-0">
+                <i class="fa-solid fa-database me-2"></i>
+                Daily backups
+              </li>
+
+            </ul>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="col-md-6">
+
+        <div class="card h-100 border-0 shadow-sm">
+
+          <div class="card-body p-4">
+
+            <h3 class="fw-semibold mb-3">
+              Your profile, your identity
+            </h3>
+
+            <p class="text-secondary">
+              Your ChitChat account starts with a proper profile so people
+              can recognize and connect with you easily.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+
+              <span class="badge text-bg-light border">Full Name</span>
+              <span class="badge text-bg-light border">Username</span>
+              <span class="badge text-bg-light border">Email</span>
+              <span class="badge text-bg-light border">Mobile</span>
+              <span class="badge text-bg-light border">Date of Birth</span>
+              <span class="badge text-bg-light border">Bio / About</span>
+
+            </div>
+
+            <p class="text-secondary mt-3 mb-0">
+              Additional profile information can be added as the platform
+              grows and new features are introduced.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <hr class="my-5">
+
+
+    <!-- COMMUNITY / FUTURE -->
+    <div class="row g-5 align-items-center">
+
+      <div class="col-md-7">
+
+        <h2 class="fw-semibold">
+          ChitChat keeps evolving
+        </h2>
+
+        <p class="fs-5 text-secondary">
+          <span style="font-family: 'Cinzel';">Team-ChitChat</span>
+          regularly listens to user suggestions and collects feedback from
+          the community. Suggested features can be reviewed and ranked through
+          votes, helping us decide what should be added next.
+        </p>
+
+        <p class="fs-5 mb-0">
+          The goal is simple:
+          keep improving <span style="font-family: 'Cinzel';">ChitChat</span>
+          around the things users actually need.
+        </p>
+
+      </div>
+
+
+      <div class="col-md-5">
+
+        <div class="card border-0 shadow-sm">
+
+          <div class="card-body p-4">
+
+            <h4 class="fw-semibold mb-3">
+              Ready to connect?
+            </h4>
+
+            <p class="text-secondary">
+              Join <span style="font-family: 'Cinzel';">ChitChat</span>,
+              find your people, start a conversation and enjoy a complete
+              messaging experience.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+
+              <a href="/security/signup/" class="btn btn-primary">
+                Sign-up
+              </a>
+
+              <a href="/security/login/" class="btn btn-outline-primary">
+                Login
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+          <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+            <svg class="bi" width="30" height="24">
+              <use xlink:href="#bootstrap"></use>
+            </svg>
+          </a>
+          <span class="text-muted">© 2021 Company, Inc</span>
+        </div>
+
+        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+          </li>
+
+          <li class="ms-3"><a class="text-muted" href="#">
+              <svg class="bi" width="24" height="24">
+                <use xlink:href="#facebook"></use>
+              </svg>
+            </a></li>
+        </ul>
+      </footer>
+
+      {% if messages %}
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+        {% for message in messages %}
+
+        <div class="toast align-items-center text-bg-{{message.tags}} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast">
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+      {% endif %}
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.querySelectorAll('.toast').forEach(toast => {
+        new bootstrap.Toast(toast).show();
+      });
+    </script>
+
+  </body>
+
+</html>

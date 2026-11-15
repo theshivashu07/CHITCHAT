@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- icon -->
+    <!-- <link rel="icon" type="image/x-icon" href="happy-facess.png" /> -->
+    <link rel="icon" type="image/x-icon" href="/_uploads/icon/happy-facess.png" />
+
+    <!-- <title>{{request.user.username}} | Profile | ChitChat</title> -->
+    <title>Profile Setups | ChitChat</title>
+
+    <!-- bootstrap link and script -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- bootstrap and fontawesome icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amita:wght@400;700&family=Berkshire+Swash&family=Cinzel:wght@400..900&family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Geist:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+
+    <style>
+      * {
+        font-family: "EB Garamond";
+        /* font-family: 'PT Sans'; */
+      }
+
+      header .self-font-cinzel,
+      header .self-font-cinzel a {
+        /* font-family: 'Berkshire Swash', 'Cinzel'; */
+        font-family: "Cinzel" !important;
+      }
+
+      .profile-dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      .profile-dropdown .dropdown-menu {
+        top: 100%;
+        right: 0;
+        left: auto;
+        margin: 2px 0px;
+      }
+    </style>
+
+
+
+
+<style>
+
+
+/* Navbar links */
+header .nav .nav-link {
+    position: relative;
+    color: #212529;
+}
+
+/* Animated underline */
+header .nav .nav-link:not(.disable)::after {
+    content: "";
+    position: absolute;
+
+    /* left: 0.5rem; */
+    /* right: 0.5rem; */
+    /* bottom: 0.10rem; */
+    
+    left: 0.1rem;
+    right: 0.1rem;
+    bottom: 0.4rem;
+
+    height: 1px;
+    background-color: currentColor;
+
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+/* Hover animation - disabled ko chhodkar */
+header .nav .nav-link:not(.disable):hover::after {
+    transform: scaleX(1);
+}
+
+/* Active page */
+header .nav .nav-link.active::after {
+    transform: scaleX(1);
+}
+
+header .nav .nav-link.active {
+    font-weight: 600;
+    /* color: #772222; */
+}
+
+
+/* Disabled navbar item */
+header .nav .nav-link.disable {
+    color: grey !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Disabled par underline kabhi mat dikhana */
+header .nav .nav-link.disable::after {
+    display: none !important;
+}
+</style>
+
+
+
+
+
+
+<!-- chat scrolls -->
+<style>
+
+
+  
+
+/* ================================
+   Custom Body Scrollbar
+   ================================ */
+
+html{
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #f0f0f0 transparent;
+    scrollbar-color: #d0d0d0 transparent;
+    /* background-color: red !important; */
+}
+
+/* Chrome / Edge / Safari */
+html::-webkit-scrollbar {
+    width: 5px !important;
+}
+
+/* Scrollbar background */
+html::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Actual scrollbar handle */
+html::-webkit-scrollbar-thumb {
+    background-color: #f0f0f0;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+}
+
+/* Cursor scrollbar area par aaye */
+html::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* Arrows/buttons remove */
+html::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+
+
+</style>
+
+
+
+
+<!-- form me placeholder wala text color mujhai change karna thaa esliye, vaue ke liye black hi rahega -->
+<style>
+.form-control::placeholder {
+    /* color: blue; */
+    /* color: #b8b8b8; */
+    color: #a2a2a2;
+    opacity: 1;
+}
+
+.form-control {
+    color: black;
+}
+</style>
+
+
+  </head>
+
+  <body>
+    <main>
+      
+        
+      <header class="p-3 mb-3 border-bottom">
+        <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            
+            
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 me-lg-4 text-dark text-decoration-none self-font-cinzel" style="font-size: x-large">
+
+                <i class="fa-solid fa-headphones fa-beat me-3 fs-4" style="--fa-animation-duration: 3s;"></i>
+
+                <!-- SHIVASHU -->
+                ChitChat
+                <!-- CнιтCнαт -->
+                <!-- 
+                <div class="d-flex flex-column fw-light">
+                    <span class="fs-4 fs-lg-3 self-font-cinzel">
+                        ChitChat —
+                    </span>
+                    <span class="fs-6 fs-lg-4" style="text-transform: lowercase;font-family: 'EB Garamond';margin-top: -10px;">
+                        <span class="text-secondary">powered by</span>
+                        <span class="self-font-cinzel fs-6 fs-lg-3">SHIVASHU</span>
+                    </span>
+                </div> 
+                -->
+            </a> 
+
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 self-font-cinzel">
+                <li><a href="/" class="nav-link px-2 {% if request.path == '/' %} activate {% endif %}">Home</a></li>
+                <li><a href="/security/" class="nav-link px-2 {% if request.path == '/security/' %} activate {% endif %}">Security</a></li>
+                <li><a href="/api/" class="nav-link px-2 {% if request.path == '/api/' %} activate {% endif %}">APIs</a></li>
+                <li><a href="#" class="nav-link px-2 disable">@ChitChat</a></li>
+            </ul>
+
+
+
+            <!-- login logout manage differently -->
+
+            {% if user.is_authenticated %}
+            <div class="dropdown text-end d-flex gap-2 align-items-center">
+
+
+              <!-- 1. नोटिफिकेशन लिंक (अब यह ड्रॉपडाउन से बाहर और सुरक्षित है) -->
+              <a href="/notifications/" class="btn btn-outline-light rounded-pill position-relative p-2 me-4" style="color: black; border-color: #e2e2e2;">
+                <!-- Notification Icon -->
+                <i class="d-flex align-items-center fa-solid fa-bell fa-swing fa-shake fa-beat fs-5 p-1" style="--fa-animation-duration: 2s;"></i>
+                <!-- Notification Count Badge (बिलकुल घंटी के ऊपर दिखेगा) -->
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.75rem;">
+                  77+
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </a>
+
+              <!-- 2. यूजर नेम और डिजिग्नेशन (यह भी ड्रॉपडाउन से बाहर है ताकि नाम पर होवर करने से मेनू न खुले) -->
+              <div class="d-flex flex-column align-items-center me-2">
+                <h6 class="m-0 fw-semibold text-dark">SHivam SHukla</h6>
+                <small class="text-secondary" style="font-size: 0.8rem;">Senior AI Engineer</small>
+              </div>
+
+              <!-- 3. केवल प्रोफाइल इमेज ड्रॉपडाउन (अब होवर/क्लिक सिर्फ इसी पर काम करेगा) -->
+              <div class="dropdown profile-dropdown">
+                <a href="#" class="d-block link-dark text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="https://lh3.googleusercontent.com/a/ACg8ocKnUjMG6205OVsdQhQhjLThoHlNr36GMFJoSYG1gYLT4JCnIl3T=s360-c-no" alt="mdo" width="48" height="48" class="rounded-circle" style="border: 4px solid #e2e2e2; transition: transform 0.2s;" />
+                </a>
+
+                <!-- ड्रॉपडाउन मेनू की लिस्ट -->
+                <!-- <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1"> -->
+                <ul class="dropdown-menu dropdown-menu-end text-small p-2 pb-4 shadow" aria-labelledby="dropdownUser1" style="position: absolute;inset: 0px 0px auto auto;margin: 0px;transform: translate3d(0px, 50.4px, 0px);width: max-content;" data-popper-placement="bottom-end">
+                  <!-- <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fa-solid fa-user me-2"></i>
+                      Hey @{{request.user.username}}
+                    </a>
+                  </li> -->
+                  <!-- <li>
+                    <div class="text-start bg-dark d-flex gap-2 align-items-center p-2" style="border-top-left-radius: 45px; border-bottom-left-radius: 45px;">
+                      <a href="#" class="d-block link-dark text-decoration-none">
+                        <img src="https://lh3.googleusercontent.com/a/ACg8ocKnUjMG6205OVsdQhQhjLThoHlNr36GMFJoSYG1gYLT4JCnIl3T=s360-c-no" alt="mdo" width="70" height="70" class="rounded-circle" style="border: 4px solid #e2e2e2;">
+                      </a>
+                      <div class="d-flex flex-column align-items-center text-light">
+                        <h6 class="m-0 fw-semibold">SHivam SHukla</h6>
+                        <small class="text" style="font-size: 0.8rem;">Senior AI Engineer</small>
+                        <span class="bg-dark px-2" style="border-radius: 5px; font-size: 0.8rem;">shivashu_django</span>
+                      </div>
+                    </div>
+                  </li> -->
+                  <li>
+                    <div class="text-start d-flex gap-2 align-items-center p-2" style="">
+                      <a href="#" class="d-block link-dark text-decoration-none">
+                        <img src="https://lh3.googleusercontent.com/a/ACg8ocKnUjMG6205OVsdQhQhjLThoHlNr36GMFJoSYG1gYLT4JCnIl3T=s360-c-no" alt="mdo" width="70" height="70" class="rounded-circle" style="border: 4px solid #e2e2e2;">
+                      </a>
+                      <div class="d-flex flex-column align-items-center text-dark">
+                        <h6 class="m-0 fw-semibold">SHivam SHukla</h6>
+                        <small class="" style="font-size: 0.8rem;">Senior AI Engineer</small>
+                        <span class="bg-light px-2" style="border-radius: 5px; font-size: 0.8rem;">shivashu_django</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item {% if request.path == '/profile/' %} active {% endif %}" href="/profile/">Profile</a></li>
+                  <li><a class="dropdown-item {% if request.path == '/resume/' %} active {% endif %}" href="#">Resume</a></li>
+                  <li><a class="dropdown-item {% if request.path == '/settings/' %} active {% endif %}" href="#">Settings</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <a class="dropdown-item fw-bold text-danger" href="/security/signout/">
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-end">
+              <a href="/security/login/" class="btn btn-outline-primary me-2">Login</a>
+              <a href="/security/signup/" class="btn btn-primary">Sign-up</a>
+            </div>
+
+            {% endif %}
+
+          </div>
+        </div>
+      </header>
+
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+
+      <section>
+
+        <div class="container col-lg-9 mx-auto p-3 py-md-5">
+            
+            <!-- <section> -->
+  <div class="container col-lg-10 mx-auto py-5">
+
+    <div class="mb-5">
+      <h1 class="display-6 fw-semibold">Complete Your Profile</h1>
+      <p class="text-secondary">
+        Set up your profile so people can recognize and connect with you on
+        <span style="font-family: 'Cinzel';">ChitChat</span>.
+      </p>
+    </div>
+
+    <form method="POST" action="{% url 'profile_setups' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Profile Identity -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+          <!-- <h4 class="mb-4" style="text-decoration: underline; text-underline-position: under;"> -->
+          <h4 class="mb-4">
+            <span class="fa-solid fw-normal">➺</span>
+            Profile Identity
+          </h4>
+
+          <div class="row g-3">
+
+
+            
+            <div class="col-md-12">
+              <label for="profile_picture" class="form-label">
+                Profile Picture
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <div class="input-group">
+                <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*" required>
+                
+                <button
+                    type="button"
+                    id="profilePicturePreview"
+                    class="btn btn-outline-primary py-0 opacity-100    d-flex align-items-center gap-2"
+                    disabled>
+                        No File
+                </button> 
+
+
+              </div>
+              <div class="form-text">
+                This username can be used to find your account.
+              </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+              <label for="username" class="form-label">
+                Username
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input type="text" class="form-control" id="username" name="username" value="{{user.username}}" placeholder="Choose your username" readonly required>
+              <div class="form-text">
+                Make it unique, it will be your identity.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="full_name" class="form-label">
+                Full Name
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter your full name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="date_of_birth" class="form-label">
+                Date of Birth
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input type="date" 
+                class="form-control" 
+                id="date_of_birth" 
+                name="date_of_birth" 
+                required
+              >
+            </div>
+
+            <div class="col-md-6">
+              <label for="profession" class="form-label">
+                Profession
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="profession"
+                name="profession" 
+                placeholder="e.g. Software Engineer"
+                required
+              >
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Contact & Recovery -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+          <h4 class="mb-4">
+            <span class="fa-solid fw-normal">➺</span>
+            Contact & Recovery
+          </h4>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label for="email" class="form-label">
+                Email Id
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="Enter email id"
+                value="{{user.email}}"
+                readonly required
+              >
+            </div>
+
+            <div class="col-md-6">
+              <label for="mobile" class="form-label">
+                Mobile Number 
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              
+              <div class="input-group">
+                <select class="form-select flex-grow-0" id="country_mobile" name="country_mobile" style=" width: 150px; /*max-width: 50%; *//* min-width: 50%; */">
+                    <option value="" data-code="">
+                        None
+                    </option>
+                    <option value="IN" data-code="+91" selected>
+                        India (+91)
+                    </option>
+                    <option value="US" data-code="+1">
+                        USA (+1)
+                    </option>
+                    <option value="GB" data-code="+44">
+                        UK (+44)
+                    </option>
+                    <option value="CA" data-code="+1">
+                        Canada (+1)
+                    </option>
+                    <option value="AU" data-code="+61">
+                        Australia (+61)
+                    </option>
+                </select>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="mobile"
+                  name="mobile"
+                  placeholder="Enter 10-digit mobile number"
+                  inputmode="numeric" 
+                  pattern="[0-9]{10}" 
+                  maxlength="10" 
+                  minlength="10" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="recovery_email" class="form-label">
+                Recovery Email
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="recovery_email"
+                name="recovery_email"
+                placeholder="Enter recovery email"
+              >
+            </div>
+
+            <div class="col-md-6">
+              <label for="recovery_mobile" class="form-label">
+                Recovery Mobile
+              </label>
+              
+              <div class="input-group">
+                <select class="form-select flex-grow-0" id="country_recovery_mobile" name="country_recovery_mobile" style=" width: 150px; /*max-width: 50%; *//* min-width: 50%; */">
+                    <option value="IN" data-code="">
+                        None
+                    </option>
+                    <option value="IN" data-code="+91" selected>
+                        India (+91)
+                    </option>
+                    <option value="US" data-code="+1">
+                        USA (+1)
+                    </option>
+                    <option value="GB" data-code="+44">
+                        UK (+44)
+                    </option>
+                    <option value="CA" data-code="+1">
+                        Canada (+1)
+                    </option>
+                    <option value="AU" data-code="+61">
+                        Australia (+61)
+                    </option>
+                </select>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="recovery_mobile"
+                  name="recovery_mobile"
+                  placeholder="Enter 10-digit recovery mobile number"
+                  inputmode="numeric" 
+                  pattern="[0-9]{10}" 
+                  maxlength="10" 
+                  minlength="10" 
+                >
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- About -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+          <h4 class="mb-4">
+            <span class="fa-solid fw-normal">➺</span>
+            About You
+          </h4>
+
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label for="bio" class="form-label">Bio</label>
+              <textarea
+                class="form-control"
+                id="bio"
+                name="bio"
+                rows="3"
+                placeholder="Write a short bio..."
+              ></textarea>
+            </div>
+
+            <div class="col-12">
+              <label for="about" class="form-label">About</label>
+              <textarea
+                class="form-control"
+                id="about"
+                name="about"
+                rows="5"
+                placeholder="Tell people a little more about yourself..."
+              ></textarea>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Addresses -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+          <h4 class="mb-4">
+            <span class="fa-solid fw-normal">➺</span>
+            Addresses
+          </h4>
+
+          <div class="row g-4">
+
+            <!-- Working Address -->
+            <div class="col-md-6">
+
+              <!-- <h5 class="fw-semibold">Working Address</h5> -->
+
+              <div class="mb-3">
+                <label for="work_address" class="form-label">
+                  Working Address
+                </label>
+                <textarea
+                  class="form-control"
+                  id="work_address"
+                  name="work_address"
+                  rows="2"
+                  placeholder="Enter working address"
+                ></textarea>
+              </div>
+
+            </div>
+
+            <!-- Home Address -->
+            <div class="col-md-6">
+
+              <!-- <h5 class="fw-semibold">Home Address</h5> -->
+
+              <div class="mb-3">
+                <label for="home_address" class="form-label">
+                  Home Address
+                </label>
+                <textarea
+                  class="form-control"
+                  id="home_address"
+                  name="home_address"
+                  rows="2"
+                  placeholder="Enter home address"
+                ></textarea>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Account Information -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+          <h4 class="mb-4">
+            <span class="fa-solid fw-normal">➺</span>
+            Account Information
+          </h4>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label">
+                Joining Date
+                <sup class="fs-6 text-danger">⁎</sup>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                name="date_joined"
+                value="{{ user.date_joined|date:'d M Y, h:i:s a' }}"
+                readonly required
+              >
+              <!-- value="{{ user.profile.updated_at|date:'d M Y, h:i A' }}" -- 02 Oct 2026, 04:56 PM -->
+              <!-- value="{{ user.date_joined|date:'d M Y, h:i:s a' }}" -- 02 Oct 2026, 04:56:17 p.m. -->
+
+              <!-- <input type="hidden" name="date_joined" id="date_joined" name="date_joined" value="{{user.date_joined|date:'c'}}"> -->
+            </div>
+
+
+
+
+  <!-- Have format 06-10-2026 11:36 PM, but i want 02 Oct 2026, 04:56 PM -->
+  <!-- 
+  <div class="col-md-6">
+    <label for="validationCustomUsername" class="form-label">Last Updated</label>
+    <div class="input-group has-validation">
+              <input
+                type="datetime-local" 
+                class="form-control"
+                id="updated_at" 
+                name="updated_at"
+                readonly
+              >
+      <button type="button" class="btn btn-outline-primary input-group-text" id="inputGroupPrepend" onclick="setCurrentTime()">Pick</button>
+      <div class="invalid-feedback">
+        Please choose a username.
+      </div>
+    </div>
+  </div> 
+  -->
+
+  <!-- Now its working and shows 02 Oct 2026, 04:56 PM -->
+  <div class="col-md-6">
+    <label for="updated_at" class="form-label">
+      Last Updated
+              </label>
+
+    <div class="input-group">
+        
+        <input
+            type="text"
+            class="form-control"
+            id="updated_at"
+            name="updated_at"
+            placeholder="dd mm yyyy, hh:mm:ss a.m."
+            readonly
+        >
+
+        <button
+            type="button"
+            class="btn btn-outline-primary"
+            onclick="setCurrentTime()">
+            Pick
+        </button>
+    </div>
+</div>
+
+
+          </div>
+
+          <div class="form-text mt-3">
+            These details are managed automatically by the system. Even then you can also pick last updated date!
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Submit -->
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary btn-lg px-5">
+          Save Profile
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+<!-- </section> -->
+
+        </div>
+      </section>
+
+      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+          <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+            <svg class="bi" width="30" height="24">
+              <use xlink:href="#bootstrap"></use>
+            </svg>
+          </a>
+          <span class="text-muted">© 2021 Company, Inc</span>
+        </div>
+
+        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+          </li>
+
+          <li class="ms-3"><a class="text-muted" href="#">
+              <svg class="bi" width="24" height="24">
+                <use xlink:href="#facebook"></use>
+              </svg>
+            </a></li>
+        </ul>
+      </footer>
+
+      {% if messages %}
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+        {% for message in messages %}
+
+        <div class="toast align-items-center text-bg-{{message.tags}} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast">
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+      {% endif %}
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.querySelectorAll('.toast').forEach(toast => {
+        new bootstrap.Toast(toast).show();
+      });
+    </script>
+
+
+
+
+
+
+<!-- by default automatically updated time ko current time se pick karr lene ke liye hai -->
+
+<!-- Have format 06-10-2026 11:36 PM, but i want 02 Oct 2026, 04:56 PM -->
+<!-- 
+<script>
+function setCurrentTime() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById("updated_at").value =
+        now.toISOString().slice(0, 16);
+}
+</script> 
+-->
+
+<!-- Now its working and shows 02 Oct 2026, 04:56 PM -->
+<script>
+
+function setCurrentTime() {
+
+    const now = new Date();
+
+    /*
+    // 02 Oct 2026, 04:56 PM 
+    const formatted = now.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    }).replace(" at ", ", ")
+    // .replace(/\b(am|pm)\b/i, match => match.toUpperCase());
+    */
+
+    // 02 Oct 2026, 04:56:17 p.m.
+    const formatted = now.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+    // }).replace(",", ",").replace(/\b(am|pm)\b/i, match => match.toLowerCase() + ".");
+    }).replace(/\b(am|pm)\b/i, match => match.toLowerCase().split("").join(".") + ".")
+
+    document.getElementById("updated_at").value = formatted;
+
+}
+
+</script>
+
+
+
+
+<!-- ye ode profile ko immidiate upload karne ke liye hai taki side me dikhne v lage, yaad rakhna usee ka code hai yee -->
+
+<script>
+
+document.getElementById("profile_picture").addEventListener("change", function () {
+
+    const preview = document.getElementById("profilePicturePreview");
+    const file = this.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        this.value = "";
+        return;
+    }
+
+    const imageURL = URL.createObjectURL(file);
+
+    preview.replaceChildren();
+
+    const img = document.createElement("img");
+    img.alt = "profile";
+    img.width = 25;
+    img.height = 25;
+    img.className = "border rounded-circle";
+    img.src = imageURL;
+
+    const filename = document.createElement("span");
+    filename.className = "text-primary d-none d-sm-inline-block";
+    filename.textContent = file.name;
+
+    preview.append(img, filename);
+
+});
+
+</script>
+
+
+
+
+  </body>
+
+</html>

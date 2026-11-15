@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- icon -->
+    <!-- <link rel="icon" type="image/x-icon" href="happy-facess.png" /> -->
+    <link rel="icon" type="image/x-icon" href="/_uploads/icon/happy-facess.png" />
+
+    <title> Security | ChitChat</title>
+
+    <!-- bootstrap link and script -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- bootstrap and fontawesome icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amita:wght@400;700&family=Berkshire+Swash&family=Cinzel:wght@400..900&family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Geist:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+
+    <style>
+      body{
+        font-family: "EB Garamond";
+        /* font-family: 'PT Sans'; */
+      }
+
+      .self-font-cinzel,
+      header .self-font-cinzel a {
+        /* font-family: 'Berkshire Swash', 'Cinzel'; */
+        font-family: "Cinzel" !important;
+      }
+
+      .profile-dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      .profile-dropdown .dropdown-menu {
+        top: 100%;
+        right: 0;
+        left: auto;
+        margin: 2px 0px;
+      }
+
+      table thead th {
+        padding: 25px 10px !important
+      }
+
+      code {
+        font-size: .9em;
+        word-wrap: break-word;
+        /* background-color: beige; */
+        /* background-color: cornsilk; */
+        color: brown;
+        color: black;
+        background-color: #f8f8f8;
+        padding: 1px 5px;
+        border-radius: 2px;
+        /* font-family: 'Cinzel'; */
+        font-family: 'EB Garamond';
+        /* font-weight: bold; */
+      }
+      .accordion-button {
+        background-color: #cfe2ff4d;
+      }
+    </style>
+
+
+
+
+<style>
+
+
+/* Navbar links */
+header .nav .nav-link {
+    position: relative;
+    color: #212529;
+}
+
+/* Animated underline */
+header .nav .nav-link:not(.disable)::after {
+    content: "";
+    position: absolute;
+
+    /* left: 0.5rem; */
+    /* right: 0.5rem; */
+    /* bottom: 0.10rem; */
+    
+    left: 0.1rem;
+    right: 0.1rem;
+    bottom: 0.4rem;
+
+    height: 1px;
+    background-color: currentColor;
+
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+/* Hover animation - disabled ko chhodkar */
+header .nav .nav-link:not(.disable):hover::after {
+    transform: scaleX(1);
+}
+
+/* Active page */
+header .nav .nav-link.activate::after {
+    transform: scaleX(1);
+}
+
+header .nav .nav-link.activate {
+    font-weight: 600;
+}
+
+
+/* Disabled navbar item */
+header .nav .nav-link.disable {
+    color: grey !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Disabled par underline kabhi mat dikhana */
+header .nav .nav-link.disable::after {
+    display: none !important;
+}
+</style>
+
+
+
+
+
+<!-- chat scrolls -->
+<style>
+
+
+  
+
+/* ================================
+   Custom Body Scrollbar
+   ================================ */
+
+html{
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #f0f0f0 transparent;
+    scrollbar-color: #d0d0d0 transparent;
+    /* background-color: red !important; */
+}
+
+/* Chrome / Edge / Safari */
+html::-webkit-scrollbar {
+    width: 5px !important;
+}
+
+/* Scrollbar background */
+html::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Actual scrollbar handle */
+html::-webkit-scrollbar-thumb {
+    background-color: #f0f0f0;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+}
+
+/* Cursor scrollbar area par aaye */
+html::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* Arrows/buttons remove */
+html::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+
+
+</style>
+
+
+
+  </head>
+
+  <body>
+    <main>
+
+      
+      
+      <header class="p-3 mb-3 border-bottom">
+        <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            
+            
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 me-lg-4 text-dark text-decoration-none self-font-cinzel" style="font-size: x-large">
+
+                <i class="fa-solid fa-headphones fa-beat me-3 fs-4" style="--fa-animation-duration: 3s;"></i>
+
+                <!-- SHIVASHU -->
+                ChitChat
+                <!-- 
+                <div class="d-flex flex-column fw-light">
+                    <span class="fs-4 fs-lg-3 self-font-cinzel">
+                        ChitChat —
+                    </span>
+                    <span class="fs-6 fs-lg-4" style="text-transform: lowercase;font-family: 'EB Garamond';margin-top: -10px;">
+                        <span class="text-secondary">powered by</span>
+                        <span class="self-font-cinzel fs-6 fs-lg-3">SHIVASHU</span>
+                    </span>
+                </div> 
+                -->
+            </a> 
+
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 self-font-cinzel">
+                <li><a href="/" class="nav-link px-2 {% if request.path == '/' %} activate {% endif %}">Home</a></li>
+                <li><a href="/security/" class="nav-link px-2 {% if request.path == '/security/' %} activate {% endif %}">Security</a></li>
+                <li><a href="/api/" class="nav-link px-2 {% if request.path == '/api/' %} activate {% endif %}">APIs</a></li>
+                <li><a href="#" class="nav-link px-2 disable">@ChitChat</a></li>
+            </ul>
+
+
+
+            <!-- login logout manage differently -->
+
+            {% if user.is_authenticated %}
+            <div class="dropdown text-end d-flex gap-2 align-items-center">
+
+
+              <!-- 1. नोटिफिकेशन लिंक (अब यह ड्रॉपडाउन से बाहर और सुरक्षित है) -->
+              <a href="/notifications/" class="btn btn-outline-light rounded-pill position-relative p-2 me-4" style="color: black; border-color: #e2e2e2;">
+                <!-- Notification Icon -->
+                <i class="d-flex align-items-center fa-solid fa-bell fa-swing fa-shake fa-beat fs-5 p-1" style="--fa-animation-duration: 2s;"></i>
+                <!-- Notification Count Badge (बिलकुल घंटी के ऊपर दिखेगा) -->
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.75rem;">
+                  77+
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </a>
+
+              <!-- 2. यूजर नेम और डिजिग्नेशन (यह भी ड्रॉपडाउन से बाहर है ताकि नाम पर होवर करने से मेनू न खुले) -->
+              <div class="d-flex flex-column align-items-center me-2">
+                <h6 class="m-0 fw-semibold text-dark">SHivam SHukla</h6>
+                <small class="text-secondary" style="font-size: 0.8rem;">Senior AI Engineer</small>
+              </div>
+
+              <!-- 3. केवल प्रोफाइल इमेज ड्रॉपडाउन (अब होवर/क्लिक सिर्फ इसी पर काम करेगा) -->
+              <div class="dropdown profile-dropdown">
+                <a href="#" class="d-block link-dark text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="https://lh3.googleusercontent.com/a/ACg8ocKnUjMG6205OVsdQhQhjLThoHlNr36GMFJoSYG1gYLT4JCnIl3T=s360-c-no" alt="mdo" width="48" height="48" class="rounded-circle" style="border: 4px solid #e2e2e2; transition: transform 0.2s;" />
+                </a>
+
+                <!-- ड्रॉपडाउन मेनू की लिस्ट -->
+                <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fa-solid fa-user me-2"></i>
+                      Hey @{{request.user.username}}
+                    </a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item {% if request.path == '/profile/' %} active {% endif %}" href="/profile/">Profile</a></li>
+                  <li><a class="dropdown-item {% if request.path == '/resume/' %} active {% endif %}" href="#">Resume</a></li>
+                  <li><a class="dropdown-item {% if request.path == '/settings/' %} active {% endif %}" href="#">Settings</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <a class="dropdown-item fw-bold text-danger" href="/security/signout/">
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-end">
+              <a href="/security/login/" class="btn btn-outline-primary me-2">Login</a>
+              <a href="/security/signup/" class="btn btn-primary">Sign-up</a>
+            </div>
+
+            {% endif %}
+
+          </div>
+        </div>
+      </header>
+
+
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+      <section></section>
+
+      <section>
+
+        <div class="container py-5">
+
+          <!-- <div class="p-5 py-4 mb-5 bg-body-tertiary rounded-3  d-flex mx-auto flex-column">
+            <h1>Cover your page.</h1> <p class="col-md-8 fs-6 justify-self-center">Cover is a one-page template for building simple and beautiful home pages. Download, edit the text, and add your own fullscreen background photo to make it your own.</p> <p class="lead"> <a href="#" class="btn btn-lg btn-light fw-bold border-white bg-white">Learn more</a> </p> 
+          </div> -->
+          
+          <div class="p-5 py-4 mb-5 bg-body-tertiary rounded-3">
+            <div class="container-fluid py-5">
+              <!-- <h1 class="display-5 fw-bold self-font-cinzel fs-2">ChitChat Security</h1> -->
+              <h1 class="display-5">ChitChat Security</h1>
+              <p class="col-md-8 fs-6">
+                <!-- ChitChat handeling many securities features like: <code>JWT-based Authentication</code>, <code>OTP System</code> and also <code>Email Service</code> to update important activities. -->
+                <!-- ChitChat handeling many securities features like: <strong> JWT-based Authentication</strong>, <strong>OTP System</strong> and also <strong>Email Service</strong> to update important activities. -->
+                ChitChat handeling many securities features like: JWT-based Authentication, OTP System and also Email Service to update important activities.
+                I have Register, Login, Logout, Forget & Reset Password, Users features. Raise a bug if you've!
+              </p>
+              <a href="#" class="btn btn-dark btn-lg px-5 mt-3" type="input"> <i class="fa-solid fa-bug me-2 fs-6 fa-fade" style="--fa-animation-duration: 2s; --fa-fade-opacity: 0.6;"></i> Raise Bug </a>
+              <!-- <a href="#" class="btn btn-dark px-4" type="input"> <i class="fa-solid fa-bug me-2 fs-6 fa-fade" style="--fa-animation-duration: 2s; --fa-fade-opacity: 0.6;"></i> Raise Bug </a> -->
+            </div>
+          </div>
+
+
+          <div class="p-5 mb-5 bg-body-tertiary rounded-3">
+            <h2 id="accessibility">QNA Sessions: <a class="anchor-link" aria-label="Link to this section: Accessibility" href="#accessibility"> </a></h2>
+            <p>
+                <!-- write some texts -->
+                This page is for selective frequently asked questions-answers.
+            </p>
+
+            
+
+            <div class="accordion" id="accordionPanelsStayOpenExample">
+                <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                        — Do you have Login, Register both supports? #1
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" style="">
+                    <div class="accordion-body ps-5">
+                    <!-- <strong>This is the first item’s accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. -->
+                    <strong>Yes yess absolutely.</strong> It's normal dear to have these <code>Register/Signup</code>, <code>Login/Signin</code>, and <code>Logout/Signout</code> page options support.
+                    </div>
+                </div>
+                </div>
+                <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                        — Can I reset password incase if forgot that? #2
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                    <div class="accordion-body ps-5">
+                    <!-- <strong>This is the second item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow. -->
+                    <strong>Abslutely yess.</strong> You can go with forgot password option, we have saperate process to recover your account, you need to follow
+                    <code>Login</code> &gt; <code>Forgot Password</code> &gt; <code>Accounts</code> &gt; <code>OTP Varificaton</code> &gt; <code>Reset Password</code>.
+                    Well, you can also only <code>Reset Password</code> if yourre loggedin.
+
+                    </div>
+                </div>
+                </div>
+                <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                        — Do we have options to Login with Google/Github? Or with any other OAuth2 Socials? #3
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+                    <div class="accordion-body ps-5">
+                    <strong>Yes we have implemented all important OAuth2 Socials.</strong>
+                    I implemented <code>Login with Google</code>, <code>Google One-Tap</code> and <code>Google Auto Login</code>.
+                    Including <code>Google</code> I also have add 7 more socials <code>Apple</code>, <code>Microsoft</code>, <code>GitHub</code>, <code>Linkedin</code>, <code>Twitter</code>, <code>Instagram</code>, and <code>Discord</code> to register/login.
+                    </div>
+                </div>
+                </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+          <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+            <svg class="bi" width="30" height="24">
+              <use xlink:href="#bootstrap"></use>
+            </svg>
+          </a>
+          <span class="text-muted">© 2021 Company, Inc</span>
+        </div>
+
+        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+          </li>
+          <li class="ms-3">
+            <a class="text-muted" href="#">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+          </li>
+
+          <li class="ms-3"><a class="text-muted" href="#">
+              <svg class="bi" width="24" height="24">
+                <use xlink:href="#facebook"></use>
+              </svg>
+            </a></li>
+        </ul>
+      </footer>
+
+      {% if messages %}
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+        {% for message in messages %}
+
+        <div class="toast align-items-center text-bg-{{message.tags}} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast">
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+      {% endif %}
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.querySelectorAll('.toast').forEach(toast => {
+        new bootstrap.Toast(toast).show();
+      });
+    </script>
+
+  </body>
+
+</html>

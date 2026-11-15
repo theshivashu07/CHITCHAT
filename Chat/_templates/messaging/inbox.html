@@ -1,0 +1,341 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChitChat | Messages</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <style>
+        .unread-badge { min-width: 1.65rem; }
+        .conversation-link { gap: 1rem; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-5" style="max-width: 900px;">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+        <h2 class="mb-0">ChitChat</h2>
+        <span
+            class="badge rounded-pill bg-primary unread-badge d-none"
+            data-total-unread-count
+            title="Total unread messages"
+            aria-label="Total unread messages"
+            hidden
+        >0</span>
+    </div>
+
+    {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="status">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <h5 class="mb-3">Existing conversations</h5>
+    <div class="list-group mb-4">
+        {% for membership in memberships %}
+            <a
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center conversation-link"
+                href="{% url 'messaging:conversation_detail' membership.conversation_id %}"
+            >
+                <span>Conversation #{{ membership.conversation_id }}</span>
+
+                {% if membership.unread_count %}
+                    <span
+                        class="badge rounded-pill bg-primary unread-badge"
+                        data-unread-count-for="{{ membership.conversation_id }}"
+                        title="Unread messages"
+                        aria-label="{{ membership.unread_count }} unread messages"
+                    >{{ membership.unread_count }}</span>
+                {% else %}
+                    <span
+                        class="badge rounded-pill bg-primary unread-badge d-none"
+                        data-unread-count-for="{{ membership.conversation_id }}"
+                        title="Unread messages"
+                        aria-label="0 unread messages"
+                        hidden
+                    >0</span>
+                {% endif %}
+            </a>
+        {% empty %}
+            <p class="text-muted">No conversations yet.</p>
+        {% endfor %}
+    </div>
+
+    <h5 class="mb-3">Start a chat</h5>
+    <div class="list-group">
+        {% for other_user in other_users %}
+            <form
+                method="post"
+                action="{% url 'messaging:start_direct_chat' other_user.id %}"
+                class="list-group-item d-flex justify-content-between align-items-center gap-3"
+            >
+                {% csrf_token %}
+                <span>{{ other_user.username }}</span>
+                <button class="btn btn-primary btn-sm" type="submit">Chat</button>
+            </form>
+        {% empty %}
+            <p class="text-muted">No other users found.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="{% static 'messaging/notification-script.js' %}"></script> -->
+
+
+<!-- notification-script.js -->
+<script>
+
+/* Include on every authenticated page (ideally the shared base template). */
+document.addEventListener("DOMContentLoaded", function () {
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const socketUrl = `${protocol}//${location.host}/ws/notifications/`;
+    const chatViewport = document.getElementById("chatViewport");
+    const currentConversationId = chatViewport
+        ? Number(chatViewport.dataset.conversationId)
+        : null;
+
+    let socket = null;
+    let retryTimer = null;
+    let heartbeatTimer = null;
+    let reconnectAttempts = 0;
+    const processedMessageIds = new Set();
+
+    function sendEvent(payload) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return false;
+        try {
+            socket.send(JSON.stringify(payload));
+            return true;
+        } catch (error) {
+            console.error("Notification socket send failed:", error);
+            return false;
+        }
+    }
+
+    function setBadge(element, count) {
+        if (!element) return;
+        const value = Math.max(0, Number(count) || 0);
+        element.textContent = value > 99 ? "99+" : String(value);
+        element.hidden = value === 0;
+        element.classList.toggle("d-none", value === 0);
+    }
+
+    function applyUnreadCounts(data) {
+        const counts = data.counts || {};
+        document.querySelectorAll("[data-unread-count-for]").forEach(function (badge) {
+            setBadge(badge, counts[String(badge.dataset.unreadCountFor)] || 0);
+        });
+        document.querySelectorAll("[data-total-unread-count]").forEach(function (badge) {
+            setBadge(badge, data.total || 0);
+        });
+    }
+
+    function showToast(message) {
+        let container = document.getElementById("chitchat-toast-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "chitchat-toast-container";
+            container.className = "toast-container position-fixed bottom-0 end-0 p-3";
+            container.style.zIndex = "1090";
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement("div");
+        toast.className = "toast align-items-center text-bg-light border shadow-sm";
+        toast.setAttribute("role", "status");
+        toast.setAttribute("aria-live", "polite");
+        toast.setAttribute("aria-atomic", "true");
+        const row = document.createElement("div");
+        row.className = "d-flex";
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        const sender = message.sender_display_name || message.sender_username || "New message";
+        const text = typeof message.body === "string" ? message.body : "Sent you a message";
+        body.textContent = `${sender}: ${text.length > 120 ? text.slice(0, 117) + "…" : text}`;
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "btn-close me-2 m-auto";
+        close.setAttribute("aria-label", "Close");
+        close.addEventListener("click", function () { toast.remove(); });
+        row.append(body, close);
+        toast.appendChild(row);
+        container.appendChild(toast);
+        if (window.bootstrap && window.bootstrap.Toast) {
+            const instance = new bootstrap.Toast(toast, { delay: 4500 });
+            toast.addEventListener("hidden.bs.toast", function () { toast.remove(); });
+            instance.show();
+        } else {
+            toast.classList.add("show");
+            setTimeout(function () { toast.remove(); }, 5000);
+        }
+    }
+
+    function handleMessageNotification(message, fromBacklog) {
+        if (!message || message.id == null) return;
+        const id = Number(message.id);
+        if (processedMessageIds.has(id)) {
+            if (fromBacklog) sendEvent({ type: "acknowledge_notifications", message_ids: [id] });
+            return;
+        }
+        processedMessageIds.add(id);
+
+        const sameChatIsOpen = currentConversationId === Number(message.conversation_id);
+        const activelyReading = sameChatIsOpen &&
+            document.visibilityState === "visible" && document.hasFocus();
+
+        if (!activelyReading && !fromBacklog) {
+            document.querySelectorAll(
+                `[data-unread-count-for="${Number(message.conversation_id)}"]`
+            ).forEach(function (badge) {
+                const current = Number.parseInt(badge.textContent, 10) || 0;
+                setBadge(badge, current + 1);
+            });
+            document.querySelectorAll("[data-total-unread-count]").forEach(function (badge) {
+                const current = Number.parseInt(badge.textContent, 10) || 0;
+                setBadge(badge, current + 1);
+            });
+            if (!sameChatIsOpen) showToast(message);
+        }
+
+        if (fromBacklog) {
+            // Ack delivered notifications in batches below, not one WS event per message.
+            return;
+        }
+        // If this conversation is open, its chat socket acknowledges delivery/seen.
+        // The user-level socket only acknowledges delivery for inbox/other-chat pages.
+        if (!sameChatIsOpen) {
+            sendEvent({ type: "mark_delivered", message_id: id });
+        }
+        window.dispatchEvent(new CustomEvent("chitchat:new-message-notification", { detail: message }));
+    }
+
+    function updateTicks(data) {
+        window.dispatchEvent(new CustomEvent("chitchat:receipt-update", { detail: data }));
+        if (Number(data.sender_id) === 0) return;
+        const ids = Array.isArray(data.message_ids)
+            ? data.message_ids
+            : (data.message_id != null ? [data.message_id] : []);
+        ids.forEach(function (id) {
+            const row = document.querySelector(`[data-message-id="${Number(id)}"]`);
+            const status = row && row.querySelector(".message-status, .msg-status");
+            if (!status || Number(row.dataset.senderId) !== Number(data.sender_id)) return;
+            const ranks = { sent: 0, delivered: 1, seen: 2 };
+            const currentRank = ranks[status.dataset.status || "sent"] || 0;
+            const incomingRank = ranks[data.status] ?? 0;
+            if (incomingRank < currentRank) return;
+            status.textContent = incomingRank >= 1 ? "✓✓" : "✓";
+            status.dataset.status = data.status;
+            status.title = data.status === "seen" ? "Seen" : data.status === "delivered" ? "Delivered" : "Sent";
+            status.classList.toggle("text-info", data.status === "seen");
+            status.classList.toggle("msg-status-seen", data.status === "seen");
+        });
+    }
+
+    function scheduleReconnect() {
+        if (retryTimer) return;
+        reconnectAttempts += 1;
+        const delay = Math.min(1000 * (2 ** Math.min(reconnectAttempts - 1, 4)), 15000) + Math.floor(Math.random() * 500);
+        retryTimer = setTimeout(function () {
+            retryTimer = null;
+            connect();
+        }, delay);
+    }
+
+    function connect() {
+        try {
+            socket = new WebSocket(socketUrl);
+        } catch (error) {
+            console.error("Could not open notification WebSocket:", error);
+            scheduleReconnect();
+            return;
+        }
+        const currentSocket = socket;
+        currentSocket.addEventListener("open", function () {
+            if (socket !== currentSocket) return;
+            reconnectAttempts = 0;
+            sendEvent({ type: "request_unread_counts" });
+            sendEvent({ type: "heartbeat" });
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+            heartbeatTimer = setInterval(function () {
+                sendEvent({ type: "heartbeat" });
+            }, 20000);
+        });
+        currentSocket.addEventListener("message", function (event) {
+            let data;
+            try { data = JSON.parse(event.data); }
+            catch (error) { console.error("Bad notification JSON:", error); return; }
+
+            if (data.type === "unread_counts") {
+                applyUnreadCounts(data);
+            } else if (data.type === "new_message_notification") {
+                handleMessageNotification(data.message, false);
+            } else if (data.type === "pending_notifications") {
+                const list = Array.isArray(data.messages) ? data.messages : [];
+                let activeChatHasPending = false;
+                list.forEach(function (message) {
+                    const id = Number(message.id);
+                    if (!processedMessageIds.has(id)) {
+                        processedMessageIds.add(id);
+                        if (currentConversationId === Number(message.conversation_id)) {
+                            activeChatHasPending = true;
+                        } else {
+                            showToast(message);
+                        }
+                    }
+                });
+                if (activeChatHasPending) {
+                    window.dispatchEvent(new CustomEvent("chitchat:pending-chat-messages"));
+                }
+                if (list.length) {
+                    sendEvent({
+                        type: "acknowledge_notifications",
+                        message_ids: list.map(function (message) { return Number(message.id); }),
+                    });
+                }
+            } else if (data.type === "receipt_update" || data.type === "receipt_batch_update") {
+                updateTicks(data);
+            } else if (data.type === "connection_established") {
+                // The unread-count snapshot and pending notification batch follow this event.
+            }
+        });
+        currentSocket.addEventListener("close", function () {
+            if (socket !== currentSocket) return;
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+            scheduleReconnect();
+        });
+        currentSocket.addEventListener("error", function (error) {
+            console.error("Notification WebSocket error:", error);
+        });
+    }
+
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+            sendEvent({ type: "heartbeat" });
+            sendEvent({ type: "request_unread_counts" });
+        }
+    });
+    window.addEventListener("beforeunload", function () {
+        if (heartbeatTimer) clearInterval(heartbeatTimer);
+        if (retryTimer) clearTimeout(retryTimer);
+    });
+
+    connect();
+});
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
